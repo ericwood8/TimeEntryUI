@@ -1,0 +1,120 @@
+<main class="main">
+    <div class="content">
+        <div class="left-side">
+            <div>
+                <h1>Projects</h1>
+                <button (click)="add()" class="btn">Add New Project</button>
+
+                <!-- Search -->
+                <div class="form-group form-group-search mb-3">
+                    <input type="text" class="form-control" placeholder="Search by Name" [(ngModel)]="searchText" />
+                    <button class="btn btn-outline-secondary" type="button" (click)="search()"> Search </button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Default?</th>
+                            <th>Active?</th>
+                            <th>Tasks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let project of paginatedProjects">
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.isDefault ? "Yes" : "No" }}</td>
+                            <td>{{ project.isActive ? "Yes" : "No" }}</td>
+                            <td>{{ project.tasks?.length ?? 0 }}</td>
+                            <td>
+                                <button (click)="edit(project)"
+                                    class="btn-action">Edit</button>
+                                <button (click)="delete(project.projectId!)"
+                                    class="btn-action delete disabled">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <mat-paginator
+                    [length]="projects.length"
+                    [pageSize]="pageSize"
+                    [pageSizeOptions]="[10, 20, 30]"
+                    (page)="onPageChange($event)">
+                </mat-paginator>
+
+                <div *ngIf="selectedRow" class="form-container">
+                    <h2>{{selectedRow?.projectId ? 'Edit' : 'Add'}}
+                        Project</h2>
+                    <form id="projectForm" (ngSubmit)="submit(selectedRow)">
+                        <div class="form-group">
+                            <label for="projectName">Project Name</label>
+                            <input type="text" id="projectName"
+                                name="projectName"
+                                [(ngModel)]="selectedRow.name"
+                                placeholder="Enter project name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="isActive">Active?</label>
+                            <select id="isActive" name="isActive" [(ngModel)]="selectedRow.isActive" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="isDefault">Default?</label>
+                            <select id="isDefault" name="isDefault" [(ngModel)]="selectedRow.isDefault" required>
+                                <option [ngValue]=true>Yes</option>
+                                <option [ngValue]=false>No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <h6>Tasks</h6>
+                            <button type="button" class="btn-action" (click)="addTask()">Add New Task</button>
+                        </div>
+                        <table class="w-100">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Active?</th>
+                                    <th>Default?</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let task of selectedRow.tasks;let i = index;">
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="taskName_{{i}}" name="taskName_{{i}}" [(ngModel)]="task.name" placeholder="Enter task name" required>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <select id="taskIsActive_{{i}}" name="taskIsActive_{{i}}" [(ngModel)]="task.isActive" required>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <select id="taskisDefault_{{i}}" name="taskisDefault_{{i}}" [(ngModel)]="task.isDefault" required>
+                                                <option ngValue]=true>Yes</option>
+                                                <option [ngValue]=false>No</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button (click)="deleteTask(i)" class="btn-action delete disabled"> Delete </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="submit" class="btn"> Submit </button>
+                        <button type="button" (click)="cancel()" class="btn btn-outline"> Cancel </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

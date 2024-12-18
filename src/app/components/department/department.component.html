@@ -1,0 +1,116 @@
+<main class="main">
+    <div class="content">
+      <div class="left-side">
+<div>
+    <!-- Heading -->
+    <h1>Departments</h1>
+    <button (click)="newDepartment()" class="btn">Add New Department</button>
+
+    <!-- Search -->
+    <div class="form-group form-group-search dept">
+        <input type="text" class="form-control" placeholder="Search by Name" [(ngModel)]="searchText" />
+        <button class="btn btn-outline-secondary" type="button" (click)="searchDepartment()"> Search </button>
+    </div>
+
+    <!-- Grid -->
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Default?</th>
+                <th>Active?</th>
+                <th>Teams</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let department of departments">
+                <td>{{ department.name }}</td>
+                <td>{{ department.isDefault ? "Yes" : "No" }}</td>
+                <td>{{ department.isActive ? "Yes" : "No" }}</td>
+                <td>{{ department.teams?.length ?? 0 }}</td>
+                <td>
+                    <button (click)="editDepartment(department)" class="btn-action">Edit</button>
+                    <button (click)="deleteDepartment(department.departmentId!)" class="btn-action delete">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Add/Edit Form -->
+    <div *ngIf="selectedRow" class="form-container">
+        <h2>{{selectedRow?.departmentId ? 'Edit' : 'Add'}} Department</h2>
+    
+        <form id="departmentForm" (ngSubmit)="submitDepartment(selectedRow)">
+            <div class="form-group">
+                <label for="departmentName">Department Name</label>
+                <input type="text" id="departmentName" name="departmentName" [(ngModel)]="selectedRow.name"
+                    placeholder="Enter department name" required>
+            </div>
+            <div class="form-group">
+                <label for="isDefault">Default?</label>
+                <select id="isDefault" name="isDefault"  [(ngModel)]="selectedRow.isDefault" required>
+                    <option [ngValue]=true>Yes</option>
+                    <option [ngValue]=false>No</option>
+                </select>
+            </div>         
+            <div class="form-group">
+                <label for="isActive">Active?</label>
+                <select id="isActive" name="isActive"  [(ngModel)]="selectedRow.isActive" required>
+                    <option [ngValue]=true>Yes</option>
+                    <option [ngValue]=false>No</option>
+                </select>
+            </div>            
+            <div>
+                <h6>Teams</h6>
+                <button type="button" class="btn-action" (click)="createTeam()">Add New Team</button>
+            </div>
+
+            <!-- Teams Table -->
+            <table class="w-100">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Default?</th>
+                        <th>Active?</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let team of selectedRow.teams;let i = index;">
+                        <td>
+                            <div class="form-group">
+                                <input type="text" id="teamName_{{i}}" name="teamName_{{i}}" [(ngModel)]="team.name"  placeholder="Enter team name" required>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <select id="teamisDefault_{{i}}" name="teamisDefault_{{i}}"  [(ngModel)]="team.isDefault" required>
+                                    <option [ngValue]=true>Yes</option>
+                                    <option [ngValue]=false>No</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>    
+                            <div class="form-group">
+                                <select id="teamisActive_{{i}}" name="teamiisActive_{{i}}"  [(ngModel)]="team.isActive" required>
+                                    <option [ngValue]=true>Yes</option>
+                                    <option [ngValue]=false>No</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <button (click)="deleteTeam(i)" class="btn-action delete disabled">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" (click)="cancelDepartment()" class="btn btn-outline">Cancel</button>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</main>

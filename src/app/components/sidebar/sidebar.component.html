@@ -1,0 +1,16 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened class="sidenav-menu"
+               [fixedInViewport]="false">
+               <mat-list role="list">
+                <mat-list-item role="listitem"><div routerLink="time">Time</div></mat-list-item>
+                <mat-list-item role="listitem"><div routerLink="">Projects</div></mat-list-item>
+                <mat-list-item role="listitem"><div routerLink="employee">Employees</div></mat-list-item>
+                <mat-list-item role="listitem"><div routerLink="department">Departments</div></mat-list-item>
+                <mat-list-item role="listitem"><div routerLink="holiday">Holidays</div></mat-list-item>
+                <mat-list-item role="listitem"><div routerLink="request">Requests</div></mat-list-item>
+              </mat-list>
+  </mat-sidenav>
+  <mat-sidenav-content class="sidenav-content">
+     <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

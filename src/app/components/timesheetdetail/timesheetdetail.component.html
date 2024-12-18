@@ -1,0 +1,117 @@
+<div id="timeSheetDetailContainer">
+  <h1>Details</h1>
+  <button (click)="newTimeSheetDetail()" class="btn">Add New Detail</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Project</th>
+        <th>Project Task</th>
+        <th>Sunday</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (detail of this.timeSheetDetails; track detail) {
+      <tr>
+        <td>
+          {{detail.projectName}}
+        </td>
+        <td>
+          {{detail.projectTaskName}}
+        </td>
+        <td>
+          {{detail.sundayHours}}
+        </td>
+        <td>
+          {{detail.mondayHours}}
+        </td>
+        <td>
+          {{detail.tuesdayHours}}
+        </td>
+        <td>
+          {{detail.wednesdayHours}}
+        </td>
+        <td>
+          {{detail.thursdayHours}}
+        </td>
+        <td>
+          {{detail.fridayHours}}
+        </td>
+        <td>
+          {{detail.saturdayHours}}
+        </td>
+        <td>
+          <button class="btn-action" (click)="this.selectTimeSheetDetail(detail)">Edit</button>
+          <button class="btn-action delete disabled">Delete</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  <button class="btn-action" (click)="this.onShowTimeSheetDetails(false)">Cancel</button>
+  @if (this.selectedTimeSheetDetail != null) {
+  <div class="form-container">
+    <h2>{{selectedTimeSheetDetail.timeSheetDetailId ? 'Edit' : 'Add'}}Detail</h2>
+    <form id="timeSheetDetailForm" (submit)="onSubmit(this.selectedTimeSheetDetail)">
+      <div class="form-group">
+        <div class="form-group">
+          <label for="projectId">Project</label>
+          <select id="projectId" [(ngModel)]="this.selectedTimeSheetDetail.projectId" (ngModelChange)="onProjectSelect($event)" name="projectId">
+            @for (project of this.projects; track $index) {
+            <option value="{{project.projectId}}">{{project.name}}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="projectTaskId">Project Task</label>
+          <select id="projectTaskId" name="projectTaskId" [(ngModel)]="this.selectedTimeSheetDetail.projectTaskId">
+            @for (task of this.projectTasks; track $index) {
+            <option value="{{task.projectTaskId}}">{{task.name}}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sundayHours">Sunday</label>
+          <input id="sundayHours" [(ngModel)]="this.selectedTimeSheetDetail.sundayHours" name="sundayHours">
+        </div>
+        <div class="form-group">
+          <label for="mondayHours">Monday</label>
+          <input type="text" id="mondayHours" [(ngModel)]="this.selectedTimeSheetDetail.mondayHours" name="mondayHours">
+        </div>
+        <div class="form-group">
+          <label for="tuesdayHours">Tuesday</label>
+          <input type="text" id="tuesdayHours" [(ngModel)]="this.selectedTimeSheetDetail.tuesdayHours" name="tuesdayHours">
+        </div>
+        <div class="form-group">
+          <label for="wednesdayHours">Wednesday</label>
+          <input type="text" id="wednesdayHours" [(ngModel)]="this.selectedTimeSheetDetail.wednesdayHours" name="wednesdayHours">
+        </div>
+        <div class="form-group">
+          <label for="thursdayHours">Thursday</label>
+          <input type="text" id="thursdayHours" [(ngModel)]="this.selectedTimeSheetDetail.thursdayHours" name="thursdayHours">
+        </div>
+        <div class="form-group">
+          <label for="fridayHours">Friday</label>
+          <input type="text" id="fridayHours" [(ngModel)]="this.selectedTimeSheetDetail.fridayHours" name="fridayHours">
+        </div>
+        <div class="form-group">
+          <label for="saturdayHours">Saturday</label>
+          <input type="text" id="saturdayHours" [(ngModel)]="this.selectedTimeSheetDetail.saturdayHours" name="saturdayHours">
+        </div>
+        <div class="form-group">
+          <label for="saturdayHours">Notes</label>
+          <input type="textarea" id="notes" [(ngModel)]="this.selectedTimeSheetDetail.notes" name="notes">
+        </div>
+      </div>
+      <button class="btn" type="submit" (submit)="onSubmit(this.selectedTimeSheetDetail)" btn>Submit</button>
+      <button type="button" (click)="clear()" class="btn btn-outline">Cancel</button>
+    </form>
+  </div>
+  }
+  </div>

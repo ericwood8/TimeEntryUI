@@ -1,0 +1,145 @@
+<!-- request.component.html -->
+<main class="main">
+    <div class="content">
+        <div class="left-side">
+            <div>
+                <h1>Requests</h1>
+                <button (click)="add()" class="btn">Add New Request</button>
+                <table *ngIf="paginatedRequests!.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Reason</th>
+                            <th>Requested On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let request of paginatedRequests">
+                            <td>{{ request.reason }}</td>
+                            <td>{{ request.whenRequested | date: 'short' }}</td>
+                            <td>{{ SY_RequestStatusTypeEnum[request.sY_RequestStatusTypeId ?? 1] }}</td>
+                            <td>
+                                <button (click)="edit(request)"
+                                    class="btn-action">Edit</button>
+                                <button (click)="delete(request.requestId!)"
+                                    class="btn-action delete disabled">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <mat-paginator
+                    *ngIf="requests!.length > 0"
+                    [length]="requests.length"
+                    [pageSize]="pageSize"
+                    [pageSizeOptions]="[5, 10, 25]"
+                    (page)="onPageChange($event)">
+                </mat-paginator>
+
+                <div *ngIf="selectedRequest" class="form-container">
+                    <h2>{{selectedRequest?.requestId ? 'Edit' : 'Add'}}
+                        Request</h2>
+                    <form #requestForm="ngForm"
+                        (ngSubmit)="submit(selectedRequest)">
+                        <div class="form-group">
+                            <label>Reason</label>
+                            <div class="inline-group">
+                                <label><input type="radio" name="reason"
+                                        value="Leave"
+                                        [(ngModel)]="selectedRequest.reason"
+                                        (change)="onReasonChange('Leave')">
+                                    Leave</label>
+                            </div>
+                            <div class="inline-group">
+                                <label><input type="radio" name="reason"
+                                        value="Clearance"
+                                        [(ngModel)]="selectedRequest.reason"
+                                        (change)="onReasonChange('Clearance')">
+                                    Clearance</label>
+                            </div>
+
+
+                            <div class="inline-group">
+                                <label><input type="radio" name="reason"
+                                        value="Overtime"
+                                        [(ngModel)]="selectedRequest.reason"
+                                        (change)="onReasonChange('Overtime')">
+                                    Overtime</label>
+                            </div>
+
+                            <div class="inline-group">
+                                <label><input type="radio" name="reason"
+                                        value="Expense"
+                                        [(ngModel)]="selectedRequest.reason"
+                                        (change)="onReasonChange('Expense')">
+                                    Expense</label>
+                            </div>
+                        </div>
+
+                        <div *ngIf="showClearanceOptions" class="form-group">
+                            <label for="clearanceType">Clearance Type</label>
+                            <select id="clearanceType" name="clearanceType"
+                                [(ngModel)]="selectedRequest.clearanceTypeId"
+                                required>
+                                <option *ngFor="let option of clearanceOptions"
+                                    [value]="option.value">{{ option.key
+                                    }}</option>
+                            </select>
+                        </div>
+
+                        <div *ngIf="showOvertimeOptions" class="form-group">
+                            <label for="overtimeType">Overtime Type</label>
+                            <select id="overtimeType" name="overtimeType"
+                                [(ngModel)]="selectedRequest.overtimeTypeId"
+                                required>
+                                <option *ngFor="let option of overtimeOptions"
+                                    [value]="option.value">{{ option.key
+                                    }}</option>
+                            </select>
+                            <label for="overtimeHrsRequested">Overtime Hours</label>
+                            <input type="number" id="overtimeHrsRequested"
+                                name="overtimeHrsRequested" [(ngModel)]="selectedRequest.overtimeHrsRequested"
+                                min="1" required>
+                        </div>
+
+                        <div *ngIf="showLeaveOptions" class="form-group">
+                            <label for="leaveType">Leave Type</label>
+                            <select id="leaveType" name="leaveType"
+                                [(ngModel)]="selectedRequest.leaveTypeId"
+                                required>
+                                <option *ngFor="let option of leaveOptions"
+                                    [value]="option.value">{{ option.key
+                                    }}</option>
+                            </select>
+                            <label for="leaveStart">Leave Start Date</label>
+                            <input type="date" id="leaveStart" name="leaveStart"
+                                [(ngModel)]="selectedRequest.leaveStart" required>
+                            <label for="leaveEnd">Leave End Date</label>
+                            <input type="date" id="leaveEnd" name="leaveEnd"
+                                [(ngModel)]="selectedRequest.leaveEnd" required>
+                        </div>
+
+                        <div *ngIf="showExpenseOptions" class="form-group">
+                            <label for="expenseType">Expense Type</label>
+                            <select id="expenseType" name="expenseType"
+                                [(ngModel)]="selectedRequest.expenseTypeId"
+                                required>
+                                <option *ngFor="let option of expenseOptions"
+                                    [value]="option.value">{{ option.key
+                                    }}</option>
+                            </select>
+                        </div>
+
+                        <!-- <div class="form-group">
+                            <label for="whenRequested">Date of Request</label>
+                            <input type="date" id="whenRequested"
+                                name="whenRequested" [(ngModel)]="selectedRequest.whenRequested"
+                                required>
+                        </div> -->
+
+                        <button type="submit" class="btn">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

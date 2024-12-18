@@ -1,0 +1,64 @@
+<main class="main">
+  <div class="content">
+    <div class="left-side">
+      @if(!this.showTimeSheetDetails){
+      <div id="timeSheetContainer">
+        <h1>Time</h1>
+        <button (click)="new()" class="btn">Add New Row</button>
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Entered</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sheet of this.timeSheets; track sheet) {
+            <tr>
+              <td> {{sheet.employee?.name}}</td>
+              <td>
+                {{sheet.whenEntered}}
+              </td>
+              <td>
+                {{sheet.notes}}
+              </td>
+              <td>
+                <button class="btn-action" (click)="this.selectTimeSheet(sheet)">Edit</button>
+                <button class="btn-action" (click)="this.showDetails(sheet, true)">Details</button>
+                <button class="btn-action delete disabled" (click)="this.delete(sheet)">Delete</button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        @if (this.selectedTimeSheet != null) {
+        <div class="form-container">
+          <h2>{{selectedTimeSheet.timeSheetId ? 'Edit' : 'Add'}} Time Sheet</h2>
+          <form id="timeSheetForm" (submit)="onSubmit(this.selectedTimeSheet)">
+            <div class="form-group">
+              <label for="employeeId">Employee</label>
+              <select id="employeeId" [(ngModel)]="this.selectedTimeSheet.employeeId" name="employeeId">
+                @for (employee of this.employees; track $index) {
+                <option [ngValue]="employee.employeeId">{{employee.name}}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="notes">Notes</label>
+              <input type="textarea" id="notes" [(ngModel)]="this.selectedTimeSheet.notes" name="notes">
+            </div>
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" class="btn btn-outline">Cancel</button>
+          </form>
+        </div>
+        }
+      </div>
+      }
+      @if(this.showTimeSheetDetails){
+      <app-timesheetdetail [(selectedTimeSheet)]="this.selectedTimeSheet" [(showTimeSheetDetails)]="this.showTimeSheetDetails"></app-timesheetdetail>
+      }
+    </div>
+  </div>
+</main>

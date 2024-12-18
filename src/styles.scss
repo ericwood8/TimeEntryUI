@@ -1,0 +1,405 @@
+/* You can add global styles to this file, and also import other style files */
+$bright-blue: oklch(51.01% 0.274 263.83);
+$electric-violet: oklch(53.18% 0.28 296.97);
+$french-violet: oklch(47.66% 0.246 305.88);
+$vivid-pink: oklch(69.02% 0.277 332.77);
+$hot-red: oklch(61.42% 0.238 15.34);
+$orange-red: oklch(63.32% 0.24 31.68);
+$gray-900: oklch(19.37% 0.006 300.98);
+$gray-700: oklch(36.98% 0.014 302.71);
+$gray-400: oklch(70.9% 0.015 304.04);
+$red-to-pink-to-purple-vertical-gradient: linear-gradient(180deg,
+    $orange-red  0%,
+    $vivid-pink 50%,
+    $electric-violet 100%);
+$red-to-pink-to-purple-horizontal-gradient: linear-gradient(90deg,
+    $orange-red 0%,
+    $vivid-pink 50%,
+    $electric-violet 100%);
+$pill-accent: $bright-blue;
+// $inter-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+//         Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+//         "Segoe UI Symbol";
+
+:host {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol";
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.header {
+    background-color: #623B7A !important;
+}
+
+.sidenav-container {
+    position: absolute !important;
+    top: 60px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    color: black !important;
+}
+
+.sidenav-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10%;
+    height: 100%;
+    background-color: #623B7A !important;
+    border-radius: 0;
+}
+
+.sidenav-content {
+    background-color: #D9D9D9 !important;
+}
+
+table {
+    border: none;
+    border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+    background-color: color-mix(in srgb, $pill-accent 5%, transparent);
+}
+
+tr:nth-child(6n + 1) {
+    --pill-accent: $bright-blue !important;
+}
+
+tr:nth-child(6n + 2) {
+    --pill-accent: $french-violet !important;
+}
+
+tr td:first-of-type {
+    padding-left: 1rem;
+}
+
+tr td:last-of-type {
+    padding-right: 1rem;
+}
+
+tr:nth-child(even) td:first-of-type {
+    border-top-left-radius: 2rem;
+    border-bottom-left-radius: 2rem;
+}
+
+tr:nth-child(even) td:last-of-type {
+    border-top-right-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+}
+
+th {
+    border-bottom: solid .2rem $vivid-pink !important;
+}
+
+th,
+td {
+    padding: 1rem;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+/* Form Container */
+.form-container {
+    background: #fff !important;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* Form Header */
+.form-container h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #333 !important;
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+/* Labels */
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #555 !important;
+}
+
+/* Input Fields */
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+.form-group input {
+    max-width: 93%;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border: 1px solid #4facfe !important;
+}
+
+.form-group-search {
+    display: flex;
+}
+
+.form-group-search .btn {
+    width: 100px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 10px;
+}
+
+.inline-group {
+    display: flex;
+    align-items: start;
+    margin-bottom: 10px;
+    justify-content: start;
+}
+
+.inline-group input[type="checkbox"],
+.inline-group input[type="radio"]  {
+    margin-right: 5px;
+    width: 20px;
+}
+
+/* Button Styling */
+:disabled {
+    pointer-events: none;
+    background-color: gray !important;
+}
+
+.btn {
+    display: inline-block;
+    width: 100%;
+    padding: 0.75rem;
+    background: $vivid-pink;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.btn:hover {
+    background: $french-violet !important;
+}
+
+.btn-outline {
+    background-color: white !important;
+    border: 1px solid $vivid-pink !important;
+    color: $vivid-pink !important;
+}
+
+.btn-outline:hover {
+    color: white;
+}
+
+.btn-action {
+    padding: 5px;
+    background: $vivid-pink !important;
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-left: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-action.delete {
+    background: red !important;
+}
+
+h1 {
+    font-size: 3.125rem;
+    color: $gray-900 !important;
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: -0.125rem;
+    margin: 0;
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol";
+}
+
+p {
+    margin: 0;
+    color: $gray-700;
+}
+
+main {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: inherit;
+    position: relative;
+}
+
+.angular-logo {
+    max-width: 9.2rem;
+}
+
+.content {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 3rem;
+}
+
+.content h1 {
+    margin-top: 1.75rem;
+}
+
+.content p {
+    margin-top: 1.5rem;
+}
+
+.divider {
+    width: 1px;
+    background: $red-to-pink-to-purple-vertical-gradient !important;
+    margin-inline: 0.5rem;
+}
+
+.pill-group {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    --pill-accent: $bright-blue;
+    background: color-mix(in srgb, $pill-accent 5%, transparent) !important;
+    color: $pill-accent !important;
+    padding-inline: 0.75rem;
+    padding-block: 0.375rem;
+    border-radius: 2.75rem;
+    border: 0;
+    transition: background 0.3s ease;
+    // font-family: $inter-font;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.4rem;
+    letter-spacing: -0.00875rem;
+    text-decoration: none;
+}
+
+.pill:hover {
+    background: color-mix(in srgb, $pill-accent 15%, transparent) !important;
+}
+
+.pill-group .pill:nth-child(6n + 1) {
+    --pill-accent: $bright-blue;
+}
+
+.pill-group .pill:nth-child(6n + 2) {
+    --pill-accent: $french-violet;
+}
+
+.pill-group .pill:nth-child(6n + 3),
+.pill-group .pill:nth-child(6n + 4),
+.pill-group .pill:nth-child(6n + 5) {
+    --pill-accent: $hot-red;
+}
+
+.pill-group svg {
+    margin-inline-start: 0.25rem;
+}
+
+.social-links {
+    display: flex;
+    align-items: center;
+    gap: 0.73rem;
+    margin-top: 1.5rem;
+}
+
+.social-links path {
+    transition: fill 0.3s ease;
+    fill: $gray-400 !important;
+}
+
+.social-links a:hover svg path {
+    fill: $gray-900 !important;
+}
+
+@media screen and (max-width: 650px) {
+    .content {
+        flex-direction: column;
+        width: max-content;
+    }
+
+    .divider {
+        height: 1px;
+        width: 100%;
+        background: $red-to-pink-to-purple-horizontal-gradient !important;
+        margin-block: 1.5rem;
+    }
+}
+
+.right-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1rem;
+}
+
+.header-color {
+    background-color: #B2367A !important;
+}
+
+.row-color {
+    background-color: #e0cdee !important;
+}
+
+.col-padding {
+    padding-left: 20px;
+}
+
+.mat-mdc-row {
+    color: black !important;
+}

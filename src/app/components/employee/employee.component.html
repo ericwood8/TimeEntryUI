@@ -1,0 +1,89 @@
+<main class="main">
+    <div class="content">
+      <div class="left-side">
+<div>
+    <!-- Heading -->
+    <h1>Employees</h1>
+    <button (click)="add()" class="btn">Add New Employee</button>
+
+    <!-- Search -->
+    <div class="form-group form-group-search dept">
+        <input type="text" class="form-control" placeholder="Search by Name" [(ngModel)]="searchText" />
+        <button class="btn btn-outline-secondary" type="button" (click)="search()"> Search </button>
+    </div>
+
+    <!-- Grid -->
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Active?</th>
+                <th>Manager</th>
+                <th>Department</th>
+                <th>Team</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let employee of employees">
+                <td>{{ employee.name }}</td>
+                <td>{{ employee.isActive ? "Yes" : "No" }}</td>
+                <td>{{ employee.manager?.name }} </td>
+                <td>{{ employee.department?.name }} </td>
+                <td>{{ employee.departmentTeam?.name }} </td>
+                <td>
+                    <button (click)="edit(employee)" class="btn-action"> Edit </button>
+                    <button (click)="delete(employee.employeeId!)" class="btn-action delete"> Delete </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Add/Edit Form -->
+    <div *ngIf="selectedRow" class="form-container">
+        <h2>{{selectedRow?.employeeId ? 'Edit' : 'Add'}} Employee</h2>
+        <form id="employeeForm" (ngSubmit)="submit(selectedRow)">
+            <div class="form-group">
+                <label for="employeeName">Employee Name</label>
+                <input type="text" id="employeeName" name="employeeName" [(ngModel)]="selectedRow.name"  placeholder="Enter employee name" required>
+            </div>
+            <div class="form-group">
+                <label for="isActive">Active?</label>
+                <select id="isActive" name="isActive" [(ngModel)]="selectedRow.isActive"  required>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="employee">Manager</label>
+                <select id="managerId" name="managerId" [(ngModel)]="selectedRow.managerId" required>
+                    <option *ngFor="let m of managers" [ngValue]="m.employeeId">
+                        {{m.name}}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select id="departmentId" name="departmentId" [(ngModel)]="selectedRow.departmentId" (ngModelChange)="onDepartmentSelect($event)" required>
+                    <option *ngFor="let d of departments" [ngValue]="d.departmentId">
+                        {{d.name}}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="departmentTeam">Department Team</label>
+                <select id="departmentTeamId" name="departmentTeamId" [(ngModel)]="selectedRow.departmentTeamId" (ngModelChange)="onTeamSelect($event)"  required>
+                    <option *ngFor="let t of filteredTeams" [ngValue]="t.departmentTeamId">
+                        {{t.name}}
+                    </option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" (click)="cancel()" class="btn btn-outline">Cancel</button>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</main>

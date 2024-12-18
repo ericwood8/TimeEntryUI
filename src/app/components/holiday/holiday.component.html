@@ -1,0 +1,55 @@
+<main class="main">
+    <div class="content">
+      <div class="left-side">
+<div>
+    <h1>Holidays</h1>
+    <button (click)="add()" class="btn"> Add New Holiday </button>
+
+        <!-- Search -->
+    <div class="form-group form-group-search dept">
+        <input type="text" class="form-control" placeholder="Search by Name" [(ngModel)]="searchText" />
+        <button class="btn btn-outline-secondary" type="button" (click)="search()"> Search </button>
+    </div>
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let holiday of holidays">
+                <td>{{ holiday.name }}</td>
+                <td>{{ holiday.sY_IsoCountry_Alpha3Code }}</td>
+                <td>{{ holiday.date }}</td>
+                <td>
+                    <button (click)="edit(holiday)" class="btn-action">Edit</button>
+                    <button (click)="delete(holiday.holidayId!)" class="btn-action delete">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div *ngIf="selectedRow" class="form-container">
+        <h2>{{selectedRow?.holidayId ? 'Edit' : 'Add'}} Holiday </h2>
+        <form id="holidayForm" (ngSubmit)="submit(selectedRow)">
+            <div class="form-group">
+                <label for="holidayName">Holiday Name</label>
+                <input type="text" id="holidayName" name="holidayName" [(ngModel)]="selectedRow.name"  placeholder="Enter holiday name" required>
+                <label for="countryName">Country</label>
+                <input type="text" id="sY_IsoCountry_Alpha3Code" name="countryName" [(ngModel)]="selectedRow.sY_IsoCountry_Alpha3Code"  placeholder="Enter country " required>
+                <label for="date">Date Of Holiday</label>
+                <input type="date" id="date" name="date" [(ngModel)]="selectedRow.date"  placeholder="Enter date" valueAsDate="selectedRow.date" required>
+            </div>
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" (click)="cancel()" class="btn btn-outline">Cancel</button>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</main>
