@@ -16,7 +16,8 @@ Before beginning, make sure you have the following tools installed:
 2. **Node.JS**
 3. **Angular**
    - Download Angular from (https://angular.dev/installation).
- 
+4.**Angular Material**
+   - Download from (https://material.angular.io/guide/getting-started)
 ---
 
 ## Development server
