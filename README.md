@@ -6,6 +6,19 @@ Its purpose is for employees to be able to:
 
 This project is Angular typescript v19 that uses an underpinning of Javascript.  
 
+---
+
+## Prerequisites
+
+Before beginning, make sure you have the following tools installed:
+
+1. **npm**
+2. **Node.JS**
+3. **Angular**
+   - Download Angular from (https://angular.dev/installation).
+ 
+-- 
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
