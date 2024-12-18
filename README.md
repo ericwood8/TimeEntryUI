@@ -1,5 +1,9 @@
 # TimeEntryUI
-
+   This is the user interface screens for the TimeEntryServer and TimeEntryDB repos.
+Its purpose is for employees to be able to:
+   1) enter their time for the day
+   2) request leave, clearance, expense reimbursement, and overtime
+   
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.7.
 
 ## Development server
