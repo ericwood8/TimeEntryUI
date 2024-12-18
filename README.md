@@ -3,8 +3,8 @@
 Its purpose is for employees to be able to:
    1) enter their time for the day
    2) request leave, clearance, expense reimbursement, and overtime
-   
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.7.
+
+This project is Angular typescript v19 that uses an underpinning of Javascript.  
 
 ## Development server
 
