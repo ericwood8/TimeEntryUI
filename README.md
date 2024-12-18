@@ -17,7 +17,7 @@ Before beginning, make sure you have the following tools installed:
 3. **Angular**
    - Download Angular from (https://angular.dev/installation).
  
--- 
+---
 
 ## Development server
 
