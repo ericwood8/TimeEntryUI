@@ -1,0 +1,8 @@
+COMPONENT CHECKLIST
+
+1) new folder with 4 files (CSS should be almost empty)
+2) models - new model
+3) services - new service
+4) app.config
+5) app.routes
+6) sidebar.component.html
