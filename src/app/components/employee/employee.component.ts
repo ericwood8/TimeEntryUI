@@ -5,7 +5,6 @@ import { EmployeeService } from '../../services/employee.service';
 import { DepartmentService } from '../../services/department.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-employee',
@@ -50,11 +49,9 @@ export class EmployeeComponent {
           console.log("Problem while updating!");
         }
       });
-    }
-    else {
+    } else {
       // add
       employee.employeeId = 0;
-      console.log(employee.departmentTeamId);
       this.employeeService.create(employee).subscribe((employee) => { this.employees.push(employee); },
         (error) => {
           if (error.status == 400) { alert("Name is bad or has special characters!"); }
@@ -68,7 +65,7 @@ export class EmployeeComponent {
   delete(id: number): void {
     if(confirm("Are you sure you want to delete?")){
       this.employeeService.delete(id).subscribe(() => {
-        console.log("Delete successfully!");
+        console.log("Deleted successfully!");
         this.employees = this.employees.filter((p) => p.employeeId !== id);
       }, (error) => { console.log("Problem while deleting!"); });
     }
@@ -107,13 +104,8 @@ export class EmployeeComponent {
 
   search(): void {
     this.selectedRow = null;
-
-    this.employeeService.findByName(this.searchText)
-      .subscribe({
-        next: (data) => {
-          this.employees = data;
-          console.log(data);
-        },
+    this.employeeService.findByName(this.searchText).subscribe({
+        next: (data) => { this.employees = data; },
         error: (e) => console.error(e)
       });
   }  

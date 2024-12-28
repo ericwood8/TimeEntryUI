@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
 import { Holiday } from '../../models/holiday';
 import { HolidayService } from '../../services/holiday.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 
-@Component({
-  selector: 'app-holiday',
-  standalone: true,
-  imports: [ CommonModule,  FormsModule ],
-  templateUrl: './holiday.component.html',
+@Component({ 
+  selector: 'app-holiday', 
+  standalone: true, 
+  imports: [ CommonModule, FormsModule ], 
+  templateUrl: './holiday.component.html', 
   styleUrl: './holiday.component.css'
 })
 export class HolidayComponent {
@@ -19,11 +18,11 @@ export class HolidayComponent {
 
   constructor(private holidayService: HolidayService) { }
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
     this.load();
   }
 
-  private load(): void {
+  private load(): void { 
     this.holidayService.getAll().subscribe((data) => { this.holidays = data; });
   }
 
@@ -53,7 +52,7 @@ export class HolidayComponent {
   delete(id: number): void {
     if(confirm("Are you sure you want to delete this?")){
       this.holidayService.delete(id).subscribe(() => {
-        console.log("Delete successfully!");
+        console.log("Deleted successfully!");
         this.holidays = this.holidays.filter((p) => p.holidayId !== id);
       }, (error) => { alert("Problem while deleting! " + error.message); });
     }
@@ -75,13 +74,8 @@ export class HolidayComponent {
 
   search(): void {
     this.selectedRow = null;
-
-    this.holidayService.findByName(this.searchText)
-      .subscribe({
-        next: (data) => {
-          this.holidays = data;
-          console.log(data);
-        },
+    this.holidayService.findByName(this.searchText).subscribe({
+        next: (data) => { this.holidays = data; },
         error: (e) => console.error(e)
       });
   }  
