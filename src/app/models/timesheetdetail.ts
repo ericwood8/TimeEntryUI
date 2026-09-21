@@ -1,8 +1,6 @@
-import { Input, ModelSignal } from "@angular/core";
-
 export interface TimeSheetDetail {
     timeSheetDetailId?:number;
-    e_timeSheetId?:number;
+    e_TimeSheetId?:number;
     projectId?:number;
     projectName: string;
     projectTaskId?: number;

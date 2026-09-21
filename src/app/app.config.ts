@@ -21,13 +21,13 @@ export const appConfig: ApplicationConfig = {
       positionClass: 'toast-top-right',
       preventDuplicates: true,
     }),     
-    provideAnimationsAsync(),  
+    provideAnimationsAsync(),
     TimeSheetService, 
     TimeSheetDetailService,
     ProjectService, 
     EmployeeService,
     DepartmentService,
     HolidayService,
-    ProjectTasksService, provideAnimationsAsync()
+    ProjectTasksService
   ]
 };

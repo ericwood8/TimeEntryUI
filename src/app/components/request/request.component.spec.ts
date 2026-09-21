@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { RequestComponent } from './request.component';
 
@@ -8,7 +10,9 @@ describe('ProjectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RequestComponent]
+      imports: [RequestComponent],
+      // the screen's service needs an HttpClient; the testing one never touches the network
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     })
     .compileComponents();
 

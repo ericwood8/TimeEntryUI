@@ -11,27 +11,27 @@ export class RequestService {
 
     constructor(private http: HttpClient) { }
 
-    // Get all Requests
-    get(): Observable<Request[]> {
+    // Get all requests
+    getAll(): Observable<Request[]> {
         return this.http.get<Request[]>(this.apiUrl);
     }
 
-    // Get a Request by ID
+    // Get a request by ID
     getById(id: number): Observable<Request> {
         return this.http.get<Request>(`${this.apiUrl}/${id}`);
     }
 
-    // Create a new Request
-    create(Request: Request): Observable<Request> {
-        return this.http.post<Request>(this.apiUrl, Request);
+    // Create a new request
+    create(request: Request): Observable<Request> {
+        return this.http.post<Request>(this.apiUrl, request);
     }
 
-    // Update a Request
-    update(id: number, Request: Request): Observable<Request> {
-        return this.http.put<Request>(`${this.apiUrl}/${id}`, Request);
+    // Update a request
+    update(id: number, request: Request): Observable<Request> {
+        return this.http.put<Request>(`${this.apiUrl}/${id}`, request);
     }
 
-    // Delete a Request
+    // Delete a request
     delete(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }

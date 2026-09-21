@@ -73,7 +73,7 @@ export class RequestComponent {
   }
 
   private getList(): void {
-    this.requestService.get().subscribe((data) => {
+    this.requestService.getAll().subscribe((data) => {
       this.allRequests = this.requests = data;
       this.paginatedRequests = this.requests.slice(0, this.pageSize);
       this.hasSearchResult = false;
@@ -156,27 +156,33 @@ export class RequestComponent {
     request.employeeId = this.currentEmployeeId;
     request.whenRequested = new Date();
     if (request.requestId && request.requestId > 0) {
-      this.requestService.update(request.requestId, request).subscribe(() => {
-        console.log("Updated successfully!");
-        this.selectedRequest = null;
-        this.getList();
-      }, (error) => {
-        if (error.status == 400) { alert("Bad submission!"); }
-        else { alert("Problem while updating request!"); }
-        console.log("Problem while updating request!");
+      this.requestService.update(request.requestId, request).subscribe({
+        next: () => {
+          console.log("Updated successfully!");
+          this.selectedRequest = null;
+          this.getList();
+        },
+        error: (error) => {
+          if (error.status == 400) { alert("Bad submission!"); }
+          else { alert("Problem while updating request!"); }
+          console.log("Problem while updating request!");
+        }
       });
     }
     else {
       request.requestId = 0;
       request.statusDate = new Date();
       request.sY_RequestStatusTypeId = SY_RequestStatusType.Pending;
-      this.requestService.create(request).subscribe((request) => {
-        this.getList();
-        this.selectedRequest = null;
-      }, (error) => {
-        if (error.status == 400) { alert("Bad submission!"); }
-        else if (error.status == 422) {
+      this.requestService.create(request).subscribe({
+        next: (request) => {
+          this.getList();
+          this.selectedRequest = null;
+        },
+        error: (error) => {
+          if (error.status == 400) { alert("Bad submission!"); }
+          else if (error.status == 422) {
           alert("Request already exists!");
+          }
         }
       });
     }
@@ -184,14 +190,17 @@ export class RequestComponent {
 
   delete(requestId: number): void {
     if (confirm("Are you sure you want to delete this request?")) {
-      this.requestService.delete(requestId).subscribe(() => {
-        console.log("Delete successfully!");
-        this.requests = this.allRequests.filter((p) => p.requestId !== requestId);
-        this.updatePagination();
-        this.changeRef.detectChanges();
-      }, (error) => {
-        alert("Sorry, you can not delete this record.");
-        console.log("Problem while deleting request!");
+      this.requestService.delete(requestId).subscribe({
+        next: () => {
+          console.log("Delete successfully!");
+          this.requests = this.allRequests.filter((p) => p.requestId !== requestId);
+          this.updatePagination();
+          this.changeRef.detectChanges();
+        },
+        error: (error) => {
+          alert("Sorry, you can not delete this record.");
+          console.log("Problem while deleting request!");
+        }
       });
     }
   }
@@ -201,13 +210,14 @@ export class RequestComponent {
   }
 
   edit(request: Request): void {
-    if(request.leaveStart && request.leaveStart?.indexOf("T") > -1){
-      request.leaveStart = request.leaveStart?.split("T")[0];
-    }
-    if(request.leaveEnd && request.leaveEnd?.indexOf("T") > -1){
-      request.leaveEnd = request.leaveEnd?.split("T")[0];
-    }
+    // edit a COPY: changing the row itself would change what the grid shows
     this.selectedRequest = { ...request };
+    if (this.selectedRequest.leaveStart && this.selectedRequest.leaveStart.indexOf("T") > -1) {
+      this.selectedRequest.leaveStart = this.selectedRequest.leaveStart.split("T")[0];
+    }
+    if (this.selectedRequest.leaveEnd && this.selectedRequest.leaveEnd.indexOf("T") > -1) {
+      this.selectedRequest.leaveEnd = this.selectedRequest.leaveEnd.split("T")[0];
+    }
     this.onReasonChange(request?.reason ?? 'Clearance');
   }
 

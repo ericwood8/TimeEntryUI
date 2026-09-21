@@ -4,38 +4,35 @@ import { Observable } from 'rxjs';
 import { TimeSheet } from '../models/timesheet';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class TimeSheetService {
-  private apiUrl = 'api/timesheets'; // Replace with your API URL
+    private apiUrl = 'api/timesheets'; // Replace with your API URL
 
-  constructor(private http: HttpClient) {
+    constructor(private http: HttpClient) { }
 
-  };
+    // Get all time sheets
+    getAll(): Observable<TimeSheet[]> {
+        return this.http.get<TimeSheet[]>(this.apiUrl);
+    }
 
-  // Get all timesheets
-  get(): Observable<TimeSheet[]> {
-    return this.http.get<TimeSheet[]>(this.apiUrl);
-  }
+    // Get a time sheet by ID
+    getById(id: number): Observable<TimeSheet> {
+        return this.http.get<TimeSheet>(`${this.apiUrl}/${id}`);
+    }
 
-  // Get a timesheet by ID
-  getById(id: number): Observable<TimeSheet> {
-    return this.http.get<TimeSheet>(`${this.apiUrl}/${id}`);
-  }
+    // Create a new time sheet
+    create(timeSheet: TimeSheet): Observable<TimeSheet> {
+        return this.http.post<TimeSheet>(this.apiUrl, timeSheet);
+    }
 
-  // Create a new timesheet
-  create(timeSheet: TimeSheet): Observable<TimeSheet> {
-    return this.http.post<TimeSheet>(this.apiUrl, timeSheet);
-  }
+    // Update a time sheet
+    update(id: number, timeSheet: TimeSheet): Observable<TimeSheet> {
+        return this.http.put<TimeSheet>(`${this.apiUrl}/${id}`, timeSheet);
+    }
 
-  // Update a timesheet
-  update(id: number, timeSheet: TimeSheet): Observable<TimeSheet> {
-    return this.http.put<TimeSheet>(`${this.apiUrl}/${id}`, timeSheet);
-  }
-
-  // Delete a timesheet
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
+    // Delete a time sheet
+    delete(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
 }

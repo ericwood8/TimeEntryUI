@@ -19,7 +19,7 @@
             <tr>
               <td> {{sheet.employee?.name}}</td>
               <td>
-                {{sheet.whenEntered}}
+                {{sheet.whenEntered | date:'MM/dd/yyyy'}}
               </td>
               <td>
                 {{sheet.notes}}
@@ -47,10 +47,10 @@
             </div>
             <div class="form-group">
               <label for="notes">Notes</label>
-              <input type="textarea" id="notes" [(ngModel)]="this.selectedTimeSheet.notes" name="notes">
+              <input type="text" id="notes" [(ngModel)]="this.selectedTimeSheet.notes" name="notes">
             </div>
             <button type="submit" class="btn">Submit</button>
-            <button type="button" class="btn btn-outline">Cancel</button>
+            <button type="button" class="btn btn-outline" (click)="this.clear()">Cancel</button>
           </form>
         </div>
         }

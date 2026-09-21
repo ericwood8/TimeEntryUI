@@ -39,7 +39,7 @@
     
     <!-- Add/Edit Form -->
     <div *ngIf="selectedRow" class="form-container">
-        <h2>{{selectedRow?.departmentId ? 'Edit' : 'Add'}} Department</h2>
+        <h2>{{selectedRow.departmentId ? 'Edit' : 'Add'}} Department</h2>
     
         <form id="departmentForm" (ngSubmit)="submitDepartment(selectedRow)">
             <div class="form-group">

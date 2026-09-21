@@ -38,36 +38,44 @@ export class EmployeeComponent {
 
     if (employee.employeeId) {
       // edit
-      this.employeeService.update(employee.employeeId, employee).subscribe(() => {
-        console.log("Edited successfully!");
-        this.loadEmployees();
-      }, (error) => {
-        if (error.status == 400) { alert("Name is bad or has special characters!"); }
-        else if (error.status == 422) { alert("Employee already exists!"); }
-        else {
-          alert("Problem while updating!");
-          console.log("Problem while updating!");
+      this.employeeService.update(employee.employeeId, employee).subscribe({
+        next: () => {
+          console.log("Edited successfully!");
+          this.loadEmployees();
+        },
+        error: (error) => {
+          if (error.status == 400) { alert("Name is bad or has special characters!"); }
+          else if (error.status == 422) { alert("Employee already exists!"); }
+          else {
+            alert("Problem while updating!");
+            console.log("Problem while updating!");
+          }
         }
       });
     } else {
       // add
       employee.employeeId = 0;
-      this.employeeService.create(employee).subscribe((employee) => { this.employees.push(employee); },
-        (error) => {
+      this.employeeService.create(employee).subscribe({
+        next: (employee) => { this.employees.push(employee); },
+        error: (error) => {
           if (error.status == 400) { alert("Name is bad or has special characters!"); }
           else if (error.status == 422) { alert("Employee already exists!"); }
           else { console.log("Problem while adding!", error.message); }
-        });
+        }
+      });
     }
     this.selectedRow = null;
   }
 
   delete(id: number): void {
     if(confirm("Are you sure you want to delete?")){
-      this.employeeService.delete(id).subscribe(() => {
-        console.log("Deleted successfully!");
-        this.employees = this.employees.filter((p) => p.employeeId !== id);
-      }, (error) => { console.log("Problem while deleting!"); });
+      this.employeeService.delete(id).subscribe({
+        next: () => {
+          console.log("Deleted successfully!");
+          this.employees = this.employees.filter((p) => p.employeeId !== id);
+        },
+        error: (error) => { alert(error.status == 400 ? "It cannot be deleted because it is in use!" : "Problem while deleting!"); }
+      });
     }
   }
 

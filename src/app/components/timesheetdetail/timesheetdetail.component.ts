@@ -63,7 +63,7 @@ export class TimesheetdetailComponent {
   }
 
   public getProjects() {
-    this.projectService.get().subscribe(value => this.projects = value);
+    this.projectService.getAll().subscribe(value => this.projects = value);
   }
 
   public onProjectSelect(id: number) {
@@ -77,7 +77,7 @@ export class TimesheetdetailComponent {
   public newTimeSheetDetail() {
     this.selectedTimeSheetDetail = {
       timeSheetDetailId: undefined,
-      e_timeSheetId: undefined,
+      e_TimeSheetId: undefined,
       projectId: undefined,
       projectName: '',
       projectTaskId: undefined,
@@ -97,7 +97,7 @@ export class TimesheetdetailComponent {
     console.log(this.selectedTimeSheet()?.timeSheetId)
     this.selectedTimeSheetDetail = {
       timeSheetDetailId: timeSheetDetail.timeSheetDetailId,
-      e_timeSheetId: this.selectedTimeSheet()?.timeSheetId,
+      e_TimeSheetId: this.selectedTimeSheet()?.timeSheetId,
       projectId: timeSheetDetail.projectId,
       projectName: timeSheetDetail.projectName,
       projectTaskId: timeSheetDetail.projectTaskId,

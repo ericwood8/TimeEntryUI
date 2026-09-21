@@ -44,7 +44,7 @@
                 </mat-paginator>
 
                 <div *ngIf="selectedRow" class="form-container">
-                    <h2>{{selectedRow?.projectId ? 'Edit' : 'Add'}}
+                    <h2>{{selectedRow.projectId ? 'Edit' : 'Add'}}
                         Project</h2>
                     <form id="projectForm" (ngSubmit)="submit(selectedRow)">
                         <div class="form-group">
@@ -57,8 +57,8 @@
                         <div class="form-group">
                             <label for="isActive">Active?</label>
                             <select id="isActive" name="isActive" [(ngModel)]="selectedRow.isActive" required>
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
+                                <option [ngValue]="true">Yes</option>
+                                <option [ngValue]="false">No</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -91,8 +91,8 @@
                                     <td>
                                         <div class="form-group">
                                             <select id="taskIsActive_{{i}}" name="taskIsActive_{{i}}" [(ngModel)]="task.isActive" required>
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
+                                                <option [ngValue]="true">Yes</option>
+                                                <option [ngValue]="false">No</option>
                                             </select>
                                         </div>
                                     </td>

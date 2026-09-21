@@ -29,7 +29,7 @@ export class ProjectComponent {
   }
 
   private load(): void {
-    this.projectService.get().subscribe((data) => {
+    this.projectService.getAll().subscribe((data) => {
       this.allProjects = this.projects = data;
       this.paginatedProjects = this.projects.slice(0, this.pageSize);
     });
@@ -60,43 +60,52 @@ export class ProjectComponent {
     project.tasks = project.tasks?.filter(t => t.name && t.name != "");
     if (project.projectId) {
       // Edit
-      this.projectService.update(project.projectId, project).subscribe(() => {
-        console.log("Updated successfully!");
-        this.selectedRow = null;
-        this.load();
-      }, (error) => {
-        if (error.status == 400) { alert("Name is bad or has special characters!"); }
-        else if (error.status == 422) { alert("Project already exists!"); }
-        else {
-          alert("Problem while updating!");
-          console.log("Problem while updating!");
+      this.projectService.update(project.projectId, project).subscribe({
+        next: () => {
+          console.log("Updated successfully!");
+          this.selectedRow = null;
+          this.load();
+        },
+        error: (error) => {
+          if (error.status == 400) { alert("Name is bad or has special characters!"); }
+          else if (error.status == 422) { alert("Project already exists!"); }
+          else {
+            alert("Problem while updating!");
+            console.log("Problem while updating!");
+          }
         }
       });
     }
     else {
       // Add
       project.projectId = 0;
-      this.projectService.create(project).subscribe((project) => {
-        this.projects.push(project);
-        this.selectedRow = null;
-      }, (error) => {
-        if (error.status == 400) { alert("Name is bad or has special characters!"); }
-        else if(error.status == 422){ alert("Project already exists!"); }
-        else {alert("Problem while adding! " + error.message); }
+      this.projectService.create(project).subscribe({
+        next: (project) => {
+          this.projects.push(project);
+          this.selectedRow = null;
+        },
+        error: (error) => {
+          if (error.status == 400) { alert("Name is bad or has special characters!"); }
+          else if(error.status == 422){ alert("Project already exists!"); }
+          else {alert("Problem while adding! " + error.message); }
+        }
       });
     }
   }
 
   delete(id: number): void {
     if (confirm("Are you sure you want to delete this?")) {
-      this.projectService.delete(id).subscribe(() => {
-        console.log("Delete successfully!");
-        this.projects = this.allProjects.filter((p) => p.projectId !== id);
-        this.updatePagination();
-        this.changeRef.detectChanges();
-      }, (error) => {
-        alert("Sorry, you can not delete this record.");
-        console.log("Problem while deleting!");
+      this.projectService.delete(id).subscribe({
+        next: () => {
+          console.log("Delete successfully!");
+          this.projects = this.allProjects.filter((p) => p.projectId !== id);
+          this.updatePagination();
+          this.changeRef.detectChanges();
+        },
+        error: (error) => {
+          alert("Sorry, you can not delete this record.");
+          console.log("Problem while deleting!");
+        }
       });
     }
   }

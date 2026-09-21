@@ -32,37 +32,45 @@ export class DepartmentComponent {
   submitDepartment(department: Department): void {
     if (department.departmentId) {
       // Edit
-      this.departmentService.update(department.departmentId, department).subscribe(() => {
-        console.log("Updated successfully!");
-        this.loadDepartments();
-      }, (error) => {
-        if (error.status == 400) { alert("Name is bad or has special characters!"); }
-        else if (error.status == 422) { alert("Department already exists!"); }
-        else {
-          alert("Problem while updating!");
-          console.log("Problem while updating!");
+      this.departmentService.update(department.departmentId, department).subscribe({
+        next: () => {
+          console.log("Updated successfully!");
+          this.loadDepartments();
+        },
+        error: (error) => {
+          if (error.status == 400) { alert("Name is bad or has special characters!"); }
+          else if (error.status == 422) { alert("Department already exists!"); }
+          else {
+            alert("Problem while updating!");
+            console.log("Problem while updating!");
+          }
         }
       });
     }
     else {
       // Create
       department.departmentId = 0;
-      this.departmentService.create(department).subscribe((department) => { this.departments.push(department); },
-        (error) => {
+      this.departmentService.create(department).subscribe({
+        next: (department) => { this.departments.push(department); },
+        error: (error) => {
           if (error.status == 400) { alert("Name is bad or has special characters!"); }
           else if (error.status == 422) { alert("Department already exists!"); }
           else { console.log("Problem while editing!", error.message); }
-        });
+        }
+      });
     }
     this.selectedRow = null;
   }
 
   deleteDepartment(id: number): void {
     if(confirm("Are you sure you want to delete?")){
-      this.departmentService.delete(id).subscribe(() => {
-        console.log("Delete successfully!");
-        this.departments = this.departments.filter((p) => p.departmentId !== id);
-      }, (error) => { console.log("Problem while deleting!"); });
+      this.departmentService.delete(id).subscribe({
+        next: () => {
+          console.log("Delete successfully!");
+          this.departments = this.departments.filter((p) => p.departmentId !== id);
+        },
+        error: (error) => { alert(error.status == 400 ? "It cannot be deleted because it is in use!" : "Problem while deleting!"); }
+      });
     }
   }
 
