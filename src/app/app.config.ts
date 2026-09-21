@@ -28,6 +28,6 @@ export const appConfig: ApplicationConfig = {
     EmployeeService,
     DepartmentService,
     HolidayService,
-    ProjectTasksService
+    ProjectTasksService, provideAnimationsAsync()
   ]
 };
