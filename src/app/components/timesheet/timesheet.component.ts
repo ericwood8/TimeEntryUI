@@ -48,8 +48,10 @@ export class TimeSheetComponent {
         error: (e) => {
           console.error(e);
         },
-        next: (timeSheet) => {
-          this.timeSheets.push(timeSheet)
+        next: (created) => {
+          // the server sends back the row without the employee it points to; look it up so the grid can show the name
+          created.employee = this.employeeOf(created.employeeId);
+          this.timeSheets.push(created);
           this.clear();
         }
       });
@@ -61,8 +63,10 @@ export class TimeSheetComponent {
         error: (e) => {
           console.error(e);
         },
-        next: (timeSheet) => {
-        this.clear();
+        next: () => {
+          // the person may have picked another employee: refresh the name the grid shows
+          timeSheet.employee = this.employeeOf(timeSheet.employeeId);
+          this.clear();
         }
       });
     }
@@ -105,11 +109,15 @@ export class TimeSheetComponent {
       next: (timeSheets) => {
         this.timeSheets = timeSheets
         this.timeSheets.forEach(timeSheet => {
-          timeSheet.employee = this.employees[this.employees.findIndex(employee => employee.employeeId == timeSheet.employeeId)];
+          timeSheet.employee = this.employeeOf(timeSheet.employeeId);
         });
       }
     }
     )
+  }
+
+  private employeeOf(employeeId?: number): Employee | undefined {
+    return this.employees.find(employee => employee.employeeId == employeeId);
   }
 
   private getEmployees() {
