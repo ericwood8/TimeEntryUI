@@ -1,3 +1,8 @@
 <mat-toolbar class="header">
     <mat-icon>punch_clock</mat-icon><span>Time Entry</span>
+    <span class="spacer"></span>
+    @if (auth.user(); as user) {
+    <span class="user">{{ user.name }} ({{ user.sY_Role }})</span>
+    <button type="button" class="logout" (click)="auth.logout()">Sign out</button>
+    }
     </mat-toolbar>

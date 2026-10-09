@@ -1,3 +1,4 @@
+import { apiMessage } from "../../services/api-error";
 import { Component } from '@angular/core';
 import { Department, DepartmentTeam } from '../../models/department';
 import { DepartmentService } from '../../services/department.service';
@@ -38,10 +39,10 @@ export class DepartmentComponent {
           this.loadDepartments();
         },
         error: (error) => {
-          if (error.status == 400) { alert("Name is bad or has special characters!"); }
-          else if (error.status == 422) { alert("Department already exists!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
+          else if (error.status == 422) { alert(apiMessage(error, "Department already exists!")); }
           else {
-            alert("Problem while updating!");
+            alert(apiMessage(error, "Problem while updating!"));
             console.log("Problem while updating!");
           }
         }
@@ -53,8 +54,8 @@ export class DepartmentComponent {
       this.departmentService.create(department).subscribe({
         next: (department) => { this.departments.push(department); },
         error: (error) => {
-          if (error.status == 400) { alert("Name is bad or has special characters!"); }
-          else if (error.status == 422) { alert("Department already exists!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
+          else if (error.status == 422) { alert(apiMessage(error, "Department already exists!")); }
           else { console.log("Problem while editing!", error.message); }
         }
       });
@@ -111,11 +112,12 @@ export class DepartmentComponent {
   
   createTeam(): void {
     const departmentTeam = { departmentTeamId: 0, name: '', isDefault: false, isActive: true, departmentId: this.selectedRow?.departmentId ?? 0};
-    this.selectedRow?.teams.push(departmentTeam);
-    console.log(this.selectedRow?.teams);
+    if (this.selectedRow) {
+      (this.selectedRow.teams ??= []).push(departmentTeam); // the server sends null when a department has no teams yet
+    }
   }
 
   deleteTeam(index: number) {
-    this.selectedRow?.teams.splice(index, 1);
+    this.selectedRow?.teams?.splice(index, 1);
   }
 }

@@ -1,3 +1,4 @@
+import { apiMessage } from "../../services/api-error";
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Project, ProjectTask } from '../../models/project';
 import { ProjectService } from '../../services/project.service';
@@ -67,10 +68,10 @@ export class ProjectComponent {
           this.load();
         },
         error: (error) => {
-          if (error.status == 400) { alert("Name is bad or has special characters!"); }
-          else if (error.status == 422) { alert("Project already exists!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
+          else if (error.status == 422) { alert(apiMessage(error, "Project already exists!")); }
           else {
-            alert("Problem while updating!");
+            alert(apiMessage(error, "Problem while updating!"));
             console.log("Problem while updating!");
           }
         }
@@ -85,8 +86,8 @@ export class ProjectComponent {
           this.selectedRow = null;
         },
         error: (error) => {
-          if (error.status == 400) { alert("Name is bad or has special characters!"); }
-          else if(error.status == 422){ alert("Project already exists!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
+          else if(error.status == 422){ alert(apiMessage(error, "Project already exists!")); }
           else {alert("Problem while adding! " + error.message); }
         }
       });
@@ -131,11 +132,12 @@ export class ProjectComponent {
 
   addTask(): void {
     const projectTask = { projectTaskId: 0, name: '', projectId: this.selectedRow?.projectId ?? 0, isDefault: true, isActive: true };
-    this.selectedRow?.tasks.push(projectTask);
-    console.log(this.selectedRow?.tasks);
+    if (this.selectedRow) {
+      (this.selectedRow.tasks ??= []).push(projectTask); // the server sends null when a project has no tasks yet
+    }
   }
 
   deleteTask(index: number) {
-    this.selectedRow?.tasks.splice(index, 1);
+    this.selectedRow?.tasks?.splice(index, 1);
   }
 }

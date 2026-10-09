@@ -52,7 +52,12 @@ export class TimesheetdetailComponent {
   }
 
   public getTimeSheetDetails() {
-    this.timeSheetDetailService.getTimeSheetDetailById(this.selectedTimeSheet()?.timeSheetId as number).subscribe({
+    const timeSheetId = this.selectedTimeSheet()?.timeSheetId;
+    if (timeSheetId == undefined) {
+      this.timeSheetDetails = [];
+      return;
+    }
+    this.timeSheetDetailService.getTimeSheetDetailById(timeSheetId).subscribe({
       error: (e) => {
         console.error(e);
       },
@@ -71,7 +76,26 @@ export class TimesheetdetailComponent {
   }
 
   public selectTimeSheetDetail(timeSheetDetail: TimeSheetDetail) {
-    this.selectedTimeSheetDetail = timeSheetDetail;
+    // edit a COPY: changing the row itself would change what the grid shows
+    this.selectedTimeSheetDetail = { ...timeSheetDetail };
+    if (timeSheetDetail.projectId != undefined) {
+      this.onProjectSelect(timeSheetDetail.projectId); // the task list must hold this project's tasks for the drop-down to show the saved one
+    }
+  }
+
+  public deleteTimeSheetDetail(timeSheetDetail: TimeSheetDetail) {
+    if (timeSheetDetail.timeSheetDetailId == undefined || !confirm("Are you sure you want to delete this detail?")) {
+      return;
+    }
+    this.timeSheetDetailService.deleteTimeSheetDetail(timeSheetDetail.timeSheetDetailId).subscribe({
+      next: () => {
+        this.timeSheetDetails = this.timeSheetDetails.filter(d => d.timeSheetDetailId !== timeSheetDetail.timeSheetDetailId);
+      },
+      error: (e) => {
+        alert(e.status == 400 ? "It cannot be deleted because it is in use!" : "Problem while deleting!");
+        console.error(e);
+      }
+    });
   }
 
   public newTimeSheetDetail() {
@@ -94,45 +118,25 @@ export class TimesheetdetailComponent {
   }
 
   public createUpdateTimeSheetDetail(timeSheetDetail: TimeSheetDetail) {
-    console.log(this.selectedTimeSheet()?.timeSheetId)
-    this.selectedTimeSheetDetail = {
-      timeSheetDetailId: timeSheetDetail.timeSheetDetailId,
-      e_TimeSheetId: this.selectedTimeSheet()?.timeSheetId,
-      projectId: timeSheetDetail.projectId,
-      projectName: timeSheetDetail.projectName,
-      projectTaskId: timeSheetDetail.projectTaskId,
-      projectTaskName: timeSheetDetail.projectTaskName,
-      sundayHours: timeSheetDetail.sundayHours,
-      mondayHours: timeSheetDetail.mondayHours,
-      tuesdayHours: timeSheetDetail.tuesdayHours,
-      wednesdayHours: timeSheetDetail.wednesdayHours,
-      thursdayHours: timeSheetDetail.thursdayHours,
-      fridayHours: timeSheetDetail.fridayHours,
-      saturdayHours: timeSheetDetail.saturdayHours,
-      notes: timeSheetDetail.notes
+    // the names come from the server; only the ids are saved
+    const detail: TimeSheetDetail = { ...timeSheetDetail, e_TimeSheetId: this.selectedTimeSheet()?.timeSheetId };
+    const saved = {
+      error: (e: unknown) => {
+        console.error(e);
+      },
+      next: () => {
+        this.selectedTimeSheetDetail = undefined;
+        this.getTimeSheetDetails(); // show what the server now holds, including the names
+      }
+    };
+    //New detail
+    if (detail.timeSheetDetailId == undefined) {
+      detail.timeSheetDetailId = 0;
+      this.timeSheetDetailService.createTimeSheetDetail(detail).subscribe(saved);
     }
-    //New time sheet
-    if (this.selectedTimeSheetDetail.timeSheetDetailId == undefined) {
-      this.selectedTimeSheetDetail.timeSheetDetailId = 0;
-      this.timeSheetDetailService.createTimeSheetDetail(this.selectedTimeSheetDetail).subscribe({
-        error: (e) => {
-          console.error(e);
-        },
-        next: (timeSheetDetail) => {
-          this.selectedTimeSheetDetail = undefined;
-        }
-      });
-    }
-    //existing time sheet
+    //existing detail
     else {
-      this.timeSheetDetailService.updateTimeSheetDetail(this.selectedTimeSheetDetail.timeSheetDetailId, this.selectedTimeSheetDetail).subscribe({
-        error: (e) => {
-          console.error(e);
-        },
-        next: (timeSheetDetail) => {
-          this.selectedTimeSheetDetail = undefined;
-        }
-      });
+      this.timeSheetDetailService.updateTimeSheetDetail(detail.timeSheetDetailId, detail).subscribe(saved);
     }
   }
 

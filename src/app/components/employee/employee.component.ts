@@ -1,3 +1,4 @@
+import { apiMessage } from "../../services/api-error";
 import { Component } from '@angular/core';
 import { Employee } from '../../models/employee';
 import { Department,DepartmentTeam } from '../../models/department';
@@ -44,10 +45,10 @@ export class EmployeeComponent {
           this.loadEmployees();
         },
         error: (error) => {
-          if (error.status == 400) { alert("Name is bad or has special characters!"); }
-          else if (error.status == 422) { alert("Employee already exists!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
+          else if (error.status == 422) { alert(apiMessage(error, "Employee already exists!")); }
           else {
-            alert("Problem while updating!");
+            alert(apiMessage(error, "Problem while updating!"));
             console.log("Problem while updating!");
           }
         }
@@ -58,8 +59,8 @@ export class EmployeeComponent {
       this.employeeService.create(employee).subscribe({
         next: (employee) => { this.employees.push(employee); },
         error: (error) => {
-          if (error.status == 400) { alert("Name is bad or has special characters!"); }
-          else if (error.status == 422) { alert("Employee already exists!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
+          else if (error.status == 422) { alert(apiMessage(error, "Employee already exists!")); }
           else { console.log("Problem while adding!", error.message); }
         }
       });

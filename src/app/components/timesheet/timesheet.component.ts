@@ -126,17 +126,4 @@ export class TimeSheetComponent {
       this.getTimeSheets();
     });
   }
-
-  private getDaysInWeekUTC(date: Date) {
-    let days = [];
-    let diff = date.getDay();
-    let startOfWeek = new Date(date); // a copy: the caller's date is not ours to change
-    startOfWeek.setDate(startOfWeek.getDate() - diff);
-    for (let i = 0; i < 7; i++) {
-      let day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      days.push(day);
-    }
-    return days;
-  }
 }

@@ -3,7 +3,7 @@ export interface Project {
     name: string;
     isDefault: boolean;
     isActive: boolean;
-    tasks: ProjectTask[]
+    tasks?: ProjectTask[]
 }
 
 export interface ProjectTask {

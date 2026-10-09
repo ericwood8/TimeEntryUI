@@ -5,12 +5,15 @@ import { DepartmentComponent } from './components/department/department.componen
 import { TimeSheetComponent } from './components/timesheet/timesheet.component';
 import { HolidayComponent } from './components/holiday/holiday.component';
 import { RequestComponent } from './components/request/request.component';
+import { LoginComponent } from './components/login/login.component';
+import { authGuard } from './services/auth.guard';
 
 export const routes: Routes = [
-    { path: '', component: ProjectComponent },
-    { path: 'employee', component: EmployeeComponent },
-    { path: 'department', component: DepartmentComponent },
-    { path: 'holiday', component: HolidayComponent },
-    { path : 'time', component: TimeSheetComponent},
-    { path : 'request', component: RequestComponent}   
+    { path: 'login', component: LoginComponent },
+    { path: '', canActivate: [authGuard], component: ProjectComponent },
+    { path: 'employee', canActivate: [authGuard], component: EmployeeComponent },
+    { path: 'department', canActivate: [authGuard], component: DepartmentComponent },
+    { path: 'holiday', canActivate: [authGuard], component: HolidayComponent },
+    { path: 'time', canActivate: [authGuard], component: TimeSheetComponent},
+    { path: 'request', canActivate: [authGuard], component: RequestComponent}   
 ];

@@ -2,9 +2,6 @@ FROM node:20 as build
 
 WORKDIR /app
 
-# Disable Globalization Invariant Mode
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 

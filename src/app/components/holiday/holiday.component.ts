@@ -1,3 +1,4 @@
+import { apiMessage } from "../../services/api-error";
 import { Component } from '@angular/core';
 import { Holiday } from '../../models/holiday';
 import { HolidayService } from '../../services/holiday.service';
@@ -85,7 +86,7 @@ export class HolidayComponent {
   }
 
   private showError(action: string, error: any): void {
-    if (error.status == 400) { alert("Name is bad or has special characters!"); }
+    if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
     else if (error.status == 404) { alert("This holiday no longer exists!"); this.load(); }
     else { alert("Problem while " + action + "! " + error.message); }
   }

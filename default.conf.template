@@ -2,17 +2,40 @@ server {
     listen       ${PORT};
     listen  [::]:${PORT};
     server_name  localhost;
+    root /usr/share/nginx/html;
 
     access_log  /var/log/nginx/server.access.log  main;
 
+    # P03: compress text responses (the 820 kB bundle shrinks to about a quarter), the proxied API's JSON lists included.
+    # text/html is always compressed once gzip is on.
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_types application/javascript text/javascript text/css application/json image/svg+xml text/plain application/xml;
+
+    # P03: files built by "ng build" have an 8 character hash in their name (outputHashing is "all"), so a changed file has a new name and the old one can be kept for a year. Unhashed files such as favicon.ico are not matched.
+    location ~ "-[A-Z0-9]{8}\.(?:js|css|woff2?)$" {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+
+    # P03: index.html names the current bundle files, so the browser must ask each time whether it changed (a cheap 304 when it did not).
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
     location / {
-        root /usr/share/nginx/html;
         try_files $uri $uri/ /index.html;
     }
 
     location /api/ {
         proxy_pass ${services__timeentryapi__https__0};
         proxy_http_version 1.1;
+        # P03: HTTP/1.1 with an empty Connection header lets nginx keep the connection to the API open (the default is "close").
+        # It is reused only if proxy_pass names an upstream block with "keepalive"; here it names a URL, so this is the prerequisite, not the whole fix.
+        proxy_set_header Connection "";
         proxy_ssl_server_name on;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         rewrite ^/api(/.*)$ $1 break;

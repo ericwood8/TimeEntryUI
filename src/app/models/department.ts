@@ -3,7 +3,7 @@ export interface Department {
     name: string;
     isDefault: boolean;
     isActive: boolean;
-    teams: DepartmentTeam[]
+    teams?: DepartmentTeam[]
 }
 
 export interface DepartmentTeam {

@@ -1,3 +1,4 @@
+import { apiMessage } from "../../services/api-error";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef, Component } from '@angular/core';
@@ -7,6 +8,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { RequestService } from '../../services/request.service';
 import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../models/employee';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-request',
@@ -29,7 +31,6 @@ export class RequestComponent {
   selectedRequest: Request | null = null;
   hasSearchResult!: boolean;
   employees: Employee[] = [];
-  currentEmployeeId: number = 2;
 
   selectedReason: string | null = null;
 
@@ -65,7 +66,7 @@ export class RequestComponent {
   expenseType: string | null = null;
   requestDate: string | null = null;
 
-  constructor(private requestService: RequestService, private employeeService: EmployeeService, private changeRef: ChangeDetectorRef) { }
+  constructor(private requestService: RequestService, private employeeService: EmployeeService, private changeRef: ChangeDetectorRef, private auth: AuthService) { }
 
   ngOnInit(): void {
     this.getList();
@@ -98,9 +99,19 @@ export class RequestComponent {
     this.paginatedRequests = this.requests.slice(startIndex, endIndex);
   }
 
-  onReasonChange(reason: string): void {
+  /** Shows the option panel that goes with the reason, and leaves the stored values alone (used when editing). */
+  private showOptionsFor(reason: string | null | undefined): void {
     this.resetOptions();
-    this.selectedReason = reason;
+    this.selectedReason = reason ?? null;
+    this.showClearanceOptions = reason === 'Clearance';
+    this.showOvertimeOptions = reason === 'Overtime';
+    this.showLeaveOptions = reason === 'Leave';
+    this.showExpenseOptions = reason === 'Expense';
+  }
+
+  /** The user picked a different reason: show its panel and start its values at the defaults. */
+  onReasonChange(reason: string): void {
+    this.showOptionsFor(reason);
 
     if (reason === 'Clearance') {
       this.showClearanceOptions = true;
@@ -153,9 +164,8 @@ export class RequestComponent {
   // }
 
   submit(request: Request): void {
-    request.employeeId = this.currentEmployeeId;
-    request.whenRequested = new Date();
     if (request.requestId && request.requestId > 0) {
+      // an update keeps who asked and when: the server owns those, so they are left exactly as loaded
       this.requestService.update(request.requestId, request).subscribe({
         next: () => {
           console.log("Updated successfully!");
@@ -163,13 +173,16 @@ export class RequestComponent {
           this.getList();
         },
         error: (error) => {
-          if (error.status == 400) { alert("Bad submission!"); }
-          else { alert("Problem while updating request!"); }
+          if (error.status == 400) { alert(apiMessage(error, "Bad submission!")); }
+          else { alert(apiMessage(error, "Problem while updating request!")); }
           console.log("Problem while updating request!");
         }
       });
     }
     else {
+      // the server takes the owner from the sign-in; this only keeps the form data complete
+      request.employeeId = this.auth.user()?.employeeId ?? request.employeeId;
+      request.whenRequested = new Date();
       request.requestId = 0;
       request.statusDate = new Date();
       request.sY_RequestStatusTypeId = SY_RequestStatusType.Pending;
@@ -179,10 +192,8 @@ export class RequestComponent {
           this.selectedRequest = null;
         },
         error: (error) => {
-          if (error.status == 400) { alert("Bad submission!"); }
-          else if (error.status == 422) {
-          alert("Request already exists!");
-          }
+          if (error.status == 400) { alert(apiMessage(error, "Bad submission!")); }
+          else { alert(apiMessage(error, "Problem while adding request!")); }
         }
       });
     }
@@ -218,7 +229,7 @@ export class RequestComponent {
     if (this.selectedRequest.leaveEnd && this.selectedRequest.leaveEnd.indexOf("T") > -1) {
       this.selectedRequest.leaveEnd = this.selectedRequest.leaveEnd.split("T")[0];
     }
-    this.onReasonChange(request?.reason ?? 'Clearance');
+    this.showOptionsFor(request?.reason);
   }
 
   cancel(): void {
