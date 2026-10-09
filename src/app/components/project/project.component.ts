@@ -1,10 +1,11 @@
-import { apiMessage } from "../../services/api-error";
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { Project, ProjectTask } from '../../models/project';
+import { Component, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { Project } from '../../models/project';
 import { ProjectService } from '../../services/project.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { CrudScreen } from '../crud-screen';
 
 @Component({
   selector: 'app-project',
@@ -13,127 +14,55 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
   templateUrl: './project.component.html',
   styleUrl: './project.component.css'
 })
-export class ProjectComponent {
+export class ProjectComponent extends CrudScreen<Project> {
+  protected readonly service = inject(ProjectService);
+  protected readonly noun = 'project';
+  protected readonly idKey = 'projectId';
 
-  pageSize = 10; // Default page size
+  // the list is small, so the page is cut here, from all the rows
+  pageSize = 10;
   currentPage = 0;
-  allProjects: Project[] = [];
-  projects: Project[] = [];
-  paginatedProjects: Project[] = [];
-  selectedRow: Project | null = null;
-  searchText!: string;
 
-  constructor(private projectService: ProjectService, private changeRef: ChangeDetectorRef) { }
-
-  ngOnInit(): void {
-    this.load();
-  }
-
-  private load(): void {
-    this.projectService.getAll().subscribe((data) => {
-      this.allProjects = this.projects = data;
-      this.paginatedProjects = this.projects.slice(0, this.pageSize);
-    });
-  }
-
-  search() {
-    if (this.searchText && this.searchText != "") {
-      this.paginatedProjects = this.projects = this.allProjects.filter(p => p.name?.toLowerCase().includes(this.searchText.toLowerCase()));
-    }
-    else {
-      this.load();
-    }
+  get paginatedRows(): Project[] {
+    return this.rows.slice(this.currentPage * this.pageSize, (this.currentPage + 1) * this.pageSize);
   }
 
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.updatePagination();
   }
 
-  private updatePagination(): void {
-    const startIndex = this.currentPage * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedProjects = this.projects.slice(startIndex, endIndex);
+  /** A project is found by any part of its name, among all the projects. */
+  protected override find(text: string): Observable<Project[]> {
+    return this.service.getAll().pipe(map((all) => all.filter((p) => p.name?.toLowerCase().includes(text.toLowerCase()))));
   }
 
-  submit(project: Project): void {
+  override search(): void {
+    this.currentPage = 0;
+    super.search();
+  }
+
+  protected newRow(): Project {
+    return { name: '', isDefault: true, isActive: true, tasks: [] };
+  }
+
+  protected override prepare(project: Project): void {
     project.tasks = project.tasks?.filter(t => t.name && t.name != "");
-    if (project.projectId) {
-      // Edit
-      this.projectService.update(project.projectId, project).subscribe({
-        next: () => {
-          console.log("Updated successfully!");
-          this.selectedRow = null;
-          this.load();
-        },
-        error: (error) => {
-          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
-          else if (error.status == 422) { alert(apiMessage(error, "Project already exists!")); }
-          else {
-            alert(apiMessage(error, "Problem while updating!"));
-            console.log("Problem while updating!");
-          }
-        }
-      });
-    }
-    else {
-      // Add
-      project.projectId = 0;
-      this.projectService.create(project).subscribe({
-        next: (project) => {
-          this.projects.push(project);
-          this.selectedRow = null;
-        },
-        error: (error) => {
-          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
-          else if(error.status == 422){ alert(apiMessage(error, "Project already exists!")); }
-          else {alert("Problem while adding! " + error.message); }
-        }
-      });
-    }
   }
 
-  delete(id: number): void {
-    if (confirm("Are you sure you want to delete this?")) {
-      this.projectService.delete(id).subscribe({
-        next: () => {
-          console.log("Delete successfully!");
-          this.projects = this.allProjects.filter((p) => p.projectId !== id);
-          this.updatePagination();
-          this.changeRef.detectChanges();
-        },
-        error: (error) => {
-          alert("Sorry, you can not delete this record.");
-          console.log("Problem while deleting!");
-        }
-      });
-    }
-  }
-
-  add(): void {
-    this.selectedRow = { name: '', isDefault: true, isActive: true, tasks: [] };
-  }
-
-  edit(project: Project): void {
-    this.selectedRow = { ...project };
-    if (!this.selectedRow.tasks || this.selectedRow.tasks?.length < 1) {
-      this.selectedRow.tasks = [];
-    }
-  }
-
-  cancel(): void {
-    this.selectedRow = null;
+  protected override prepareEdit(copy: Project): Project {
+    copy.tasks ??= [];   // the server sends null when a project has no tasks yet
+    return copy;
   }
 
   //===============================================
-  //  Project Tasks 
+  //  Project Tasks
   //===============================================
 
   addTask(): void {
     const projectTask = { projectTaskId: 0, name: '', projectId: this.selectedRow?.projectId ?? 0, isDefault: true, isActive: true };
     if (this.selectedRow) {
-      (this.selectedRow.tasks ??= []).push(projectTask); // the server sends null when a project has no tasks yet
+      (this.selectedRow.tasks ??= []).push(projectTask);
     }
   }
 

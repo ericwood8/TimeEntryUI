@@ -4,12 +4,12 @@
 <div>
     <!-- Heading -->
     <h1>Departments</h1>
-    <button (click)="newDepartment()" class="btn">Add New Department</button>
+    <button (click)="add()" class="btn">Add New Department</button>
 
     <!-- Search -->
     <div class="form-group form-group-search dept">
         <input type="text" class="form-control" placeholder="Search by Name" [(ngModel)]="searchText" />
-        <button class="btn btn-outline-secondary" type="button" (click)="searchDepartment()"> Search </button>
+        <button class="btn btn-outline-secondary" type="button" (click)="search()"> Search </button>
     </div>
 
     <!-- Grid -->
@@ -24,14 +24,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let department of departments">
+            <tr *ngFor="let department of rows">
                 <td>{{ department.name }}</td>
                 <td>{{ department.isDefault ? "Yes" : "No" }}</td>
                 <td>{{ department.isActive ? "Yes" : "No" }}</td>
                 <td>{{ department.teams?.length ?? 0 }}</td>
                 <td>
-                    <button (click)="editDepartment(department)" class="btn-action">Edit</button>
-                    <button (click)="deleteDepartment(department.departmentId!)" class="btn-action delete">Delete</button>
+                    <button (click)="edit(department)" class="btn-action">Edit</button>
+                    <button (click)="delete(department.departmentId!)" class="btn-action delete">Delete</button>
                 </td>
             </tr>
         </tbody>
@@ -41,7 +41,7 @@
     <div *ngIf="selectedRow" class="form-container">
         <h2>{{selectedRow.departmentId ? 'Edit' : 'Add'}} Department</h2>
     
-        <form id="departmentForm" (ngSubmit)="submitDepartment(selectedRow)">
+        <form id="departmentForm" (ngSubmit)="submit(selectedRow)">
             <div class="form-group">
                 <label for="departmentName">Department Name</label>
                 <input type="text" id="departmentName" name="departmentName" [(ngModel)]="selectedRow.name"
@@ -107,7 +107,7 @@
             </table>
             
             <button type="submit" class="btn">Submit</button>
-            <button type="button" (click)="cancelDepartment()" class="btn btn-outline">Cancel</button>
+            <button type="button" (click)="cancel()" class="btn btn-outline">Cancel</button>
         </form>
     </div>
 </div>

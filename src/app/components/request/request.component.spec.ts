@@ -62,7 +62,7 @@ describe('ProjectComponent', () => {
     expect(req.request.params.get('sort')).toBe('whenRequested:desc');
     req.flush({ pageIndex: 0, count: 12, data: [{ requestId: 1, employeeId: 1, reason: 'Leave' }] });
     expect(component.total).toBe(12);
-    expect(component.paginatedRequests.length).toBe(1);
+    expect(component.rows.length).toBe(1);
   });
 
   it('sorts on the server, reversing on a second click, and searches from the first page', () => {

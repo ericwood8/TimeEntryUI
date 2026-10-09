@@ -4,13 +4,13 @@
       @if(!this.showTimeSheetDetails){
       <div id="timeSheetContainer">
         <h1>Time</h1>
-        <button (click)="new()" class="btn">Add New Row</button>
+        <button (click)="add()" class="btn">Add New Row</button>
         <form class="search-bar" (submit)="search(); $event.preventDefault()">
           <input type="search" name="searchText" [(ngModel)]="searchText" placeholder="Search notes or employee" aria-label="Search time sheets">
           <button type="submit" class="btn-action">Search</button>
           <button type="button" class="btn-action" [disabled]="sort === defaultSort" (click)="clearSort()">Clear sort</button>
         </form>
-        @if (loaded && this.timeSheets.length === 0) {
+        @if (loaded && this.rows.length === 0) {
         <p>No time sheets{{ searchText ? ' match "' + searchText + '"' : '' }}.</p>
         }
         <table (contextmenu)="openSortMenu($event)">
@@ -23,7 +23,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (sheet of this.timeSheets; track sheet) {
+            @for (sheet of this.rows; track sheet) {
             <tr>
               <td> {{sheet.employee?.name}}</td>
               <td>
@@ -33,9 +33,9 @@
                 {{sheet.notes}}
               </td>
               <td>
-                <button class="btn-action" (click)="this.selectTimeSheet(sheet)">Edit</button>
+                <button class="btn-action" (click)="this.edit(sheet)">Edit</button>
                 <button class="btn-action" (click)="this.showDetails(sheet, true)">Details</button>
-                <button class="btn-action delete disabled" (click)="this.delete(sheet)">Delete</button>
+                <button class="btn-action delete disabled" (click)="this.delete(sheet.timeSheetId!)">Delete</button>
               </td>
             </tr>
             }
@@ -52,7 +52,7 @@
         @if (this.selectedTimeSheet != null) {
         <div class="form-container">
           <h2>{{selectedTimeSheet.timeSheetId ? 'Edit' : 'Add'}} Time Sheet</h2>
-          <form id="timeSheetForm" (submit)="onSubmit(this.selectedTimeSheet)">
+          <form id="timeSheetForm" (submit)="submit(this.selectedTimeSheet)">
             <div class="form-group">
               <label for="employeeId">Employee</label>
               <select id="employeeId" [(ngModel)]="this.selectedTimeSheet.employeeId" name="employeeId">
@@ -66,7 +66,7 @@
               <input type="text" id="notes" [(ngModel)]="this.selectedTimeSheet.notes" name="notes">
             </div>
             <button type="submit" class="btn">Submit</button>
-            <button type="button" class="btn btn-outline" (click)="this.clear()">Cancel</button>
+            <button type="button" class="btn btn-outline" (click)="this.cancel()">Cancel</button>
           </form>
         </div>
         }

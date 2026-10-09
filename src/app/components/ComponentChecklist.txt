@@ -6,3 +6,9 @@ COMPONENT CHECKLIST
 4) app.config
 5) app.routes
 6) sidebar.component.html
+
+A screen is a short class on a base (components\crud-screen.ts):
+  - extends CrudScreen<T> (or PagedCrudScreen<T> when the API pages, sorts and searches)
+  - names service, noun, idKey and newRow(); overrides prepare / prepareEdit / start / find only when the table needs it
+  - the template uses rows, selectedRow, searchText, add(), edit(row), submit(row), delete(id), cancel(), search()
+  - see holiday.component.ts (29 lines) for the smallest example

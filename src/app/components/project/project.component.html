@@ -22,7 +22,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let project of paginatedProjects">
+                        <tr *ngFor="let project of paginatedRows">
                             <td>{{ project.name }}</td>
                             <td>{{ project.isDefault ? "Yes" : "No" }}</td>
                             <td>{{ project.isActive ? "Yes" : "No" }}</td>
@@ -37,7 +37,7 @@
                     </tbody>
                 </table>
                 <mat-paginator
-                    [length]="projects.length"
+                    [length]="rows.length"
                     [pageSize]="pageSize"
                     [pageSizeOptions]="[10, 20, 30]"
                     (page)="onPageChange($event)">

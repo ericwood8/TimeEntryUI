@@ -1,4 +1,4 @@
-import { Component, HostListener, model, ModelSignal } from '@angular/core';
+import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TimeSheetService } from '../../services/timesheet.service';
 import { TimeSheet } from '../../models/timesheet';
@@ -7,10 +7,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
 import { EmployeeLookup } from '../../models/employee';
 import { FormsModule } from '@angular/forms';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { ariaSort, forgetSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/grid-sort';
-
-
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { PagedCrudScreen } from '../crud-screen';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-timegrid',
@@ -19,177 +18,52 @@ import { ariaSort, forgetSort, loadSort, nextSort, saveSort, sortMark } from '..
   templateUrl: './timesheet.component.html',
   styleUrl: './timesheet.component.css'
 })
-export class TimeSheetComponent {
-  timeSheets: TimeSheet[];
-  employees: EmployeeLookup[];
-  selectedTimeSheet: TimeSheet | undefined;
-  showTimeSheetDetails : boolean = false;
-
-  // the server pages, sorts and searches (E03): this screen holds only the page it shows
-  pageSize = 10;
-  currentPage = 0;
-  total = 0;                       // rows that match the search, over all pages
+export class TimeSheetComponent extends PagedCrudScreen<TimeSheet> {
+  protected readonly service = inject(TimeSheetService);
+  protected readonly noun = 'time sheet';
+  protected readonly idKey = 'timeSheetId';
+  protected readonly gridKey = 'timesheet';
   readonly sortableColumns = ['employee', 'whenEntered', 'notes'];
   readonly defaultSort = 'whenEntered:desc';   // newest first
-  sort = loadSort('timesheet', this.sortableColumns, this.defaultSort);   // the sort the person left, else the default
-  sortMenu: { x: number; y: number } | null = null;   // the right-click menu (Clear sort), where it is open
-  loaded = false;                  // true once a page has arrived, so "No time sheets" is not shown while waiting
-  searchText = '';
+  private readonly employeeService = inject(EmployeeService);
 
-  constructor(private timeSheetService: TimeSheetService, private employeeService: EmployeeService) {
-    this.timeSheets = [];
-    this.employees = [];
+  employees: EmployeeLookup[] = [];
+  showTimeSheetDetails: boolean = false;
+
+  /** The detail panel binds to the selected sheet by this name (it takes undefined for none). */
+  get selectedTimeSheet(): TimeSheet | undefined {
+    return this.selectedRow ?? undefined;
+  }
+  set selectedTimeSheet(sheet: TimeSheet | undefined) {
+    this.selectedRow = sheet ?? null;
   }
 
-  ngOnInit(){
+  protected override start(): void {
     // the employees must be here before the time sheets can be matched to their names
-    this.getEmployees();
+    this.employeeService.getLookup().subscribe(value => {
+      this.employees = value;
+      super.start();
+    });
   }
 
-  public selectTimeSheet(timeSheet: TimeSheet) {
-    this.selectedTimeSheet = timeSheet;
+  protected newRow(): TimeSheet {
+    return { timeSheetId: undefined, whenEntered: undefined, employeeId: undefined, notes: '' };
   }
 
-  public create(timeSheet: TimeSheet) {
-    //New time sheet
-    console.log(timeSheet)
-    if (timeSheet.timeSheetId == undefined) {
-      timeSheet.timeSheetId = 0;
+  protected override prepare(timeSheet: TimeSheet, isNew: boolean): void {
+    if (isNew) {
       timeSheet.whenEntered = new Date();
-      this.timeSheetService.create(timeSheet).subscribe({
-        error: (e) => {
-          console.error(e);
-        },
-        next: (created) => {
-          // the server sends back the row without the employee it points to; look it up so the grid can show the name
-          this.clear();
-          this.getTimeSheets();   // the new sheet is on the first page (newest first) or wherever the sort puts it
-        }
-      });
-    }
-    //existing time sheet
-    else {
-      console.log("edit timesheet")
-      this.timeSheetService.update(timeSheet.timeSheetId, timeSheet).subscribe({
-        error: (e) => {
-          console.error(e);
-        },
-        next: () => {
-          // the person may have picked another employee: refresh the name the grid shows
-          timeSheet.employee = this.employeeOf(timeSheet.employeeId);
-          this.clear();
-        }
-      });
     }
   }
 
-  public delete(timeSheet: TimeSheet) {
-    if (timeSheet.timeSheetId) {
-      this.timeSheetService.delete(timeSheet.timeSheetId).subscribe({
-        next: () => { this.getTimeSheets(); },
-        error: (e) => { alert(e.status == 400 ? "It cannot be deleted because it is in use!" : "Problem while deleting!"); console.error(e); }
-      });
-    }
-  }
-
-  onSubmit(timeSheet: TimeSheet) {
-    this.create(timeSheet);
+  protected override pageLoaded(): void {
+    this.rows.forEach(timeSheet => {
+      timeSheet.employee = this.employees.find(employee => employee.employeeId == timeSheet.employeeId);
+    });
   }
 
   public showDetails(timeSheet: TimeSheet, show: boolean) {
     this.showTimeSheetDetails = show;
     this.selectedTimeSheet = timeSheet;
-  }
-
-  public new() {
-    //Set new selected time sheet
-    this.selectedTimeSheet = {
-      timeSheetId: undefined,
-      whenEntered: undefined,
-      employeeId: undefined,
-      notes: ''
-    }
-  }
-
-  public clear() {
-    this.selectedTimeSheet = undefined;
-  }
-
-  private getTimeSheets() {
-    this.timeSheetService.getPage({ pageIndex: this.currentPage, pageSize: this.pageSize, sort: this.sort, search: this.searchText }).subscribe({
-      next: (page) => {
-        // a page past the end (the last row of the last page was deleted): go back to the last page there is
-        if (page.data.length === 0 && page.count > 0 && this.currentPage > 0) {
-          this.currentPage = Math.ceil(page.count / this.pageSize) - 1;
-          this.getTimeSheets();
-          return;
-        }
-        this.total = page.count;
-        this.timeSheets = page.data;
-        this.timeSheets.forEach(timeSheet => {
-          timeSheet.employee = this.employeeOf(timeSheet.employeeId);
-        });
-        this.loaded = true;
-      }
-    }
-    )
-  }
-
-  onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.getTimeSheets();
-  }
-
-  /** Sorts by that column; a second click on the same column reverses the order. The choice is kept for the next visit. */
-  sortBy(column: string): void {
-    this.sort = nextSort(this.sort, column);
-    saveSort('timesheet', this.sort);
-    this.currentPage = 0;
-    this.getTimeSheets();
-  }
-
-  sortMark(column: string): string {
-    return sortMark(this.sort, column);
-  }
-
-  ariaSort(column: string): 'ascending' | 'descending' | null {
-    return ariaSort(this.sort, column);
-  }
-
-  /** Back to the default order and forget the saved sort. */
-  clearSort(): void {
-    this.sort = this.defaultSort;
-    forgetSort('timesheet');
-    this.sortMenu = null;
-    this.currentPage = 0;
-    this.getTimeSheets();
-  }
-
-  openSortMenu(event: MouseEvent): void {
-    event.preventDefault();
-    this.sortMenu = { x: event.clientX, y: event.clientY };
-  }
-
-  @HostListener('document:click')
-  @HostListener('document:keydown.escape')
-  closeSortMenu(): void {
-    this.sortMenu = null;
-  }
-
-  search(): void {
-    this.currentPage = 0;
-    this.getTimeSheets();
-  }
-
-  private employeeOf(employeeId?: number): EmployeeLookup | undefined {
-    return this.employees.find(employee => employee.employeeId == employeeId);
-  }
-
-  private getEmployees() {
-    this.employeeService.getLookup().subscribe(value => {
-      this.employees = value;
-      this.getTimeSheets();
-    });
   }
 }

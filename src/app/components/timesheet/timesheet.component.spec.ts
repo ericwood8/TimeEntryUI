@@ -35,7 +35,7 @@ describe('TimegridComponent', () => {
     expect(req.request.params.get('sort')).toBe('whenEntered:desc');
     req.flush({ pageIndex: 0, count: 31, data: [{ timeSheetId: 1, employeeId: 7, notes: 'x' }] });
     expect(component.total).toBe(31);
-    expect(component.timeSheets[0].employee?.name).toBe('Pat');
+    expect(component.rows[0].employee?.name).toBe('Pat');
   });
 
   it('never loads the full employee list for the names', () => {
@@ -74,6 +74,6 @@ describe('TimegridComponent', () => {
     http.expectOne(r => r.url === 'api/timesheets' && r.params.get('pageIndex') === '2').flush({ pageIndex: 2, count: 20, data: [] });
     http.expectOne(r => r.url === 'api/timesheets' && r.params.get('pageIndex') === '1').flush({ pageIndex: 1, count: 20, data: [{ timeSheetId: 2, employeeId: 7 }] });
     expect(component.currentPage).toBe(1);
-    expect(component.timeSheets.length).toBe(1);
+    expect(component.rows.length).toBe(1);
   });
 });

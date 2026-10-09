@@ -23,7 +23,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let holiday of holidays">
+            <tr *ngFor="let holiday of rows">
                 <td>{{ holiday.name }}</td>
                 <td>{{ holiday.sY_IsoCountry_Alpha3Code }}</td>
                 <td>{{ holiday.date | date:'MM/dd/yyyy' }}</td>

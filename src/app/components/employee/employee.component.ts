@@ -1,11 +1,11 @@
-import { apiMessage } from "../../services/api-error";
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Employee } from '../../models/employee';
-import { Department,DepartmentTeam } from '../../models/department';
+import { Department, DepartmentTeam } from '../../models/department';
 import { EmployeeService } from '../../services/employee.service';
 import { DepartmentService } from '../../services/department.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CrudScreen } from '../crud-screen';
 
 @Component({
   selector: 'app-employee',
@@ -14,91 +14,32 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './employee.component.html',
   styleUrl: './employee.component.css'
 })
+export class EmployeeComponent extends CrudScreen<Employee> {
+  protected readonly service = inject(EmployeeService);
+  protected readonly noun = 'employee';
+  protected readonly idKey = 'employeeId';
+  private readonly departmentService = inject(DepartmentService);
 
-export class EmployeeComponent {
   departments: Department[] = [];
-  filteredTeams  : DepartmentTeam[] = [];
-  employees: Employee[] = [];
+  filteredTeams: DepartmentTeam[] = [];
   managers: Employee[] = [];
-  selectedRow: Employee | null = null;
-  searchText = '';
 
-  constructor(private employeeService: EmployeeService, private departmentService: DepartmentService) { }
-
-  ngOnInit(): void {
-    this.loadEmployees();
-    this.employeeService.getAll().subscribe((data) => { this.managers = data; });
+  protected override start(): void {
+    super.start();
+    this.service.getAll().subscribe((data) => { this.managers = data; });
     this.departmentService.getAll().subscribe(value => this.departments = value);
   }
 
-  private loadEmployees(): void {
-    this.employeeService.getAll().subscribe((data) => { this.employees = data; });
+  protected newRow(): Employee {
+    return { name: '', isActive: true, departmentId: 0, departmentTeamId: 0, availableLeaveHours: 0, donatedHrsReceived: 0, employeeId: 0 };
   }
 
-  submit(employee: Employee): void {
-
-    if (employee.employeeId) {
-      // edit
-      this.employeeService.update(employee.employeeId, employee).subscribe({
-        next: () => {
-          console.log("Edited successfully!");
-          this.loadEmployees();
-        },
-        error: (error) => {
-          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
-          else if (error.status == 422) { alert(apiMessage(error, "Employee already exists!")); }
-          else {
-            alert(apiMessage(error, "Problem while updating!"));
-            console.log("Problem while updating!");
-          }
-        }
-      });
-    } else {
-      // add
-      employee.employeeId = 0;
-      this.employeeService.create(employee).subscribe({
-        next: (employee) => { this.employees.push(employee); },
-        error: (error) => {
-          if (error.status == 400) { alert(apiMessage(error, "Name is bad or has special characters!")); }
-          else if (error.status == 422) { alert(apiMessage(error, "Employee already exists!")); }
-          else { console.log("Problem while adding!", error.message); }
-        }
-      });
+  protected override prepareEdit(copy: Employee): Employee {
+    // so the team drop-down holds the teams of the employee's department
+    if (copy.departmentId != null && copy.departmentTeamId != null) {
+      this.onDepartmentSelect(copy.departmentId);
     }
-    this.selectedRow = null;
-  }
-
-  delete(id: number): void {
-    if(confirm("Are you sure you want to delete?")){
-      this.employeeService.delete(id).subscribe({
-        next: () => {
-          console.log("Deleted successfully!");
-          this.employees = this.employees.filter((p) => p.employeeId !== id);
-        },
-        error: (error) => { alert(error.status == 400 ? "It cannot be deleted because it is in use!" : "Problem while deleting!"); }
-      });
-    }
-  }
-
-  add(): void {
-    this.selectedRow = { name:'', isActive: true, departmentId: 0, departmentTeamId: 0, availableLeaveHours: 0, 
-        donatedHrsReceived: 0, employeeId: 0 };
-  }
-
-  edit(employee: Employee): void {
-    this.selectedRow = { ...employee };
-
-    // Fix so loads Teams on edit
-    if (this.selectedRow != null) {
-      if (this.selectedRow.departmentId != null && this.selectedRow.departmentTeamId != null)
-      {
-        this.departmentService.getTeams(this.selectedRow.departmentId).subscribe(data => { this.filteredTeams = data; });
-      }
-    }
-  }
-
-  cancel(): void {
-    this.selectedRow = null;
+    return copy;
   }
 
   onDepartmentSelect(departmentId: number) {
@@ -107,15 +48,7 @@ export class EmployeeComponent {
 
   onTeamSelect(departmentTeamId: number) {
     if (this.selectedRow != null) {
-      this.selectedRow.departmentTeamId = departmentTeamId;  
-    }    
+      this.selectedRow.departmentTeamId = departmentTeamId;
+    }
   }
-
-  search(): void {
-    this.selectedRow = null;
-    this.employeeService.findByName(this.searchText).subscribe({
-        next: (data) => { this.employees = data; },
-        error: (e) => console.error(e)
-      });
-  }  
 }
