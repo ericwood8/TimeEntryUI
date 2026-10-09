@@ -5,12 +5,19 @@
       <div id="timeSheetContainer">
         <h1>Time</h1>
         <button (click)="new()" class="btn">Add New Row</button>
+        <form class="search-bar" (submit)="search(); $event.preventDefault()">
+          <input type="search" name="searchText" [(ngModel)]="searchText" placeholder="Search notes or employee" aria-label="Search time sheets">
+          <button type="submit" class="btn-action">Search</button>
+        </form>
+        @if (loaded && this.timeSheets.length === 0) {
+        <p>No time sheets{{ searchText ? ' match "' + searchText + '"' : '' }}.</p>
+        }
         <table>
           <thead>
             <tr>
-              <th>Employee</th>
-              <th>Entered</th>
-              <th>Notes</th>
+              <th [attr.aria-sort]="ariaSort('employee')"><button type="button" class="sort-header" (click)="sortBy('employee')">Employee{{ sortMark('employee') }}</button></th>
+              <th [attr.aria-sort]="ariaSort('whenEntered')"><button type="button" class="sort-header" (click)="sortBy('whenEntered')">Entered{{ sortMark('whenEntered') }}</button></th>
+              <th [attr.aria-sort]="ariaSort('notes')"><button type="button" class="sort-header" (click)="sortBy('notes')">Notes{{ sortMark('notes') }}</button></th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -33,6 +40,9 @@
             }
           </tbody>
         </table>
+        @if (total > 0) {
+        <mat-paginator [length]="total" [pageIndex]="currentPage" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)"></mat-paginator>
+        }
         @if (this.selectedTimeSheet != null) {
         <div class="form-container">
           <h2>{{selectedTimeSheet.timeSheetId ? 'Edit' : 'Add'}} Time Sheet</h2>

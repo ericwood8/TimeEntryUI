@@ -9,6 +9,7 @@ import { RequestService } from '../../services/request.service';
 import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../models/employee';
 import { AuthService } from '../../services/auth.service';
+import { ariaSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/grid-sort';
 
 @Component({
   selector: 'app-request',
@@ -23,13 +24,16 @@ import { AuthService } from '../../services/auth.service';
 })
 export class RequestComponent {
 
+  // the server pages, sorts and searches (E03): this screen holds only the page it shows
   pageSize = 5; // Default page size
   currentPage = 0;
-  allRequests: Request[] = [];
-  requests: Request[] = [];
+  total = 0;                       // rows that match the search, over all pages
   paginatedRequests: Request[] = [];
+  readonly sortableColumns = ['employee', 'reason', 'whenRequested', 'status'];
+  sort = loadSort('request', this.sortableColumns, 'whenRequested:desc');   // the sort the person left, else newest first
+  loaded = false;                  // true once a page has arrived, so "No requests" is not shown while waiting
+  searchText = '';
   selectedRequest: Request | null = null;
-  hasSearchResult!: boolean;
   employees: Employee[] = [];
 
   selectedReason: string | null = null;
@@ -70,15 +74,47 @@ export class RequestComponent {
 
   ngOnInit(): void {
     this.getList();
-    //this.getEmployees();
+    this.getEmployees();
   }
 
   private getList(): void {
-    this.requestService.getAll().subscribe((data) => {
-      this.allRequests = this.requests = data;
-      this.paginatedRequests = this.requests.slice(0, this.pageSize);
-      this.hasSearchResult = false;
+    this.requestService.getPage({ pageIndex: this.currentPage, pageSize: this.pageSize, sort: this.sort, search: this.searchText }).subscribe((page) => {
+      // a page past the end (the last row of the last page was deleted): go back to the last page there is
+      if (page.data.length === 0 && page.count > 0 && this.currentPage > 0) {
+        this.currentPage = Math.ceil(page.count / this.pageSize) - 1;
+        this.getList();
+        return;
+      }
+      this.total = page.count;
+      this.paginatedRequests = page.data;
+      this.loaded = true;
     });
+  }
+
+  /** Sorts by that column; a second click on the same column reverses the order. The choice is kept for the next visit. */
+  sortBy(column: string): void {
+    this.sort = nextSort(this.sort, column);
+    saveSort('request', this.sort);
+    this.currentPage = 0;
+    this.getList();
+  }
+
+  sortMark(column: string): string {
+    return sortMark(this.sort, column);
+  }
+
+  ariaSort(column: string): 'ascending' | 'descending' | null {
+    return ariaSort(this.sort, column);
+  }
+
+  /** The name to show in place of an employee id (the employees are loaded once for the grid). */
+  employeeName(id?: number): string {
+    return this.employees.find((e) => e.employeeId === id)?.name ?? '';
+  }
+
+  search(): void {
+    this.currentPage = 0;
+    this.getList();
   }
 
   private getEmployees(): void {
@@ -90,13 +126,7 @@ export class RequestComponent {
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.updatePagination();
-  }
-
-  private updatePagination(): void {
-    const startIndex = this.currentPage * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedRequests = this.requests.slice(startIndex, endIndex);
+    this.getList();
   }
 
   /** Shows the option panel that goes with the reason, and leaves the stored values alone (used when editing). */
@@ -204,8 +234,7 @@ export class RequestComponent {
       this.requestService.delete(requestId).subscribe({
         next: () => {
           console.log("Delete successfully!");
-          this.requests = this.allRequests.filter((p) => p.requestId !== requestId);
-          this.updatePagination();
+          this.getList();
           this.changeRef.detectChanges();
         },
         error: (error) => {

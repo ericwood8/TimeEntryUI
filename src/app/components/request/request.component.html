@@ -5,16 +5,23 @@
             <div>
                 <h1>Requests</h1>
                 <button (click)="add()" class="btn">Add New Request</button>
+                <form class="search-bar" (submit)="search(); $event.preventDefault()">
+                    <input type="search" name="searchText" [(ngModel)]="searchText" placeholder="Search reason or employee" aria-label="Search requests">
+                    <button type="submit" class="btn-action">Search</button>
+                </form>
+                <p *ngIf="loaded && paginatedRequests.length === 0">No requests{{ searchText ? ' match "' + searchText + '"' : '' }}.</p>
                 <table *ngIf="paginatedRequests!.length > 0">
                     <thead>
                         <tr>
-                            <th>Reason</th>
-                            <th>Requested On</th>
-                            <th>Status</th>
+                            <th [attr.aria-sort]="ariaSort('employee')"><button type="button" class="sort-header" (click)="sortBy('employee')">Employee{{ sortMark('employee') }}</button></th>
+                            <th [attr.aria-sort]="ariaSort('reason')"><button type="button" class="sort-header" (click)="sortBy('reason')">Reason{{ sortMark('reason') }}</button></th>
+                            <th [attr.aria-sort]="ariaSort('whenRequested')"><button type="button" class="sort-header" (click)="sortBy('whenRequested')">Requested On{{ sortMark('whenRequested') }}</button></th>
+                            <th [attr.aria-sort]="ariaSort('status')"><button type="button" class="sort-header" (click)="sortBy('status')">Status{{ sortMark('status') }}</button></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let request of paginatedRequests">
+                            <td>{{ employeeName(request.employeeId) }}</td>
                             <td>{{ request.reason }}</td>
                             <td>{{ request.whenRequested | date: 'short' }}</td>
                             <td>{{ SY_RequestStatusTypeEnum[request.sY_RequestStatusTypeId ?? 1] }}</td>
@@ -28,8 +35,9 @@
                     </tbody>
                 </table>
                 <mat-paginator
-                    *ngIf="requests!.length > 0"
-                    [length]="requests.length"
+                    *ngIf="total > 0"
+                    [length]="total"
+                    [pageIndex]="currentPage"
                     [pageSize]="pageSize"
                     [pageSizeOptions]="[5, 10, 25]"
                     (page)="onPageChange($event)">

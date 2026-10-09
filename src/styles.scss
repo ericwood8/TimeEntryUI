@@ -405,3 +405,19 @@ main {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* the header of a sortable column is a real button (keyboard and screen readers), drawn as the header text */
+.sort-header {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sort-header:hover,
+.sort-header:focus-visible {
+  text-decoration: underline;
+}

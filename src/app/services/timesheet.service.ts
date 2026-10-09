@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TimeSheet } from '../models/timesheet';
+import { PageQuery, Paginated, pageParams } from '../models/paginated';
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +15,11 @@ export class TimeSheetService {
     // Get all time sheets
     getAll(): Observable<TimeSheet[]> {
         return this.http.get<TimeSheet[]>(this.apiUrl);
+    }
+
+    // Get one page of time sheets, sorted and filtered by the server
+    getPage(query: PageQuery): Observable<Paginated<TimeSheet>> {
+        return this.http.get<Paginated<TimeSheet>>(this.apiUrl, { params: pageParams(query) });
     }
 
     // Get a time sheet by ID
