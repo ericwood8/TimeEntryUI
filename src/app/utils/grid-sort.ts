@@ -29,6 +29,15 @@ export function saveSort(gridKey: string, sort: string): void {
   }
 }
 
+/** Forget the saved sort of a grid (the "Clear sort" menu): the grid opens in its default order again. */
+export function forgetSort(gridKey: string): void {
+  try {
+    localStorage.removeItem(storageKey(gridKey));
+  } catch {
+    // storage unavailable: there was nothing saved
+  }
+}
+
 /** What a click on a column header gives: another column sorts ascending, the sorted column flips its direction. */
 export function nextSort(current: string, column: string): string {
   const [currentColumn, direction] = current.split(':');

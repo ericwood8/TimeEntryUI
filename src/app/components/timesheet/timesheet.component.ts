@@ -1,14 +1,14 @@
-import { Component, model, ModelSignal } from '@angular/core';
+import { Component, HostListener, model, ModelSignal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TimeSheetService } from '../../services/timesheet.service';
 import { TimeSheet } from '../../models/timesheet';
 import { TimesheetdetailComponent } from "../timesheetdetail/timesheetdetail.component";
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
-import { Employee } from '../../models/employee';
+import { EmployeeLookup } from '../../models/employee';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { ariaSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/grid-sort';
+import { ariaSort, forgetSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/grid-sort';
 
 
 
@@ -21,7 +21,7 @@ import { ariaSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/gr
 })
 export class TimeSheetComponent {
   timeSheets: TimeSheet[];
-  employees: Employee[];
+  employees: EmployeeLookup[];
   selectedTimeSheet: TimeSheet | undefined;
   showTimeSheetDetails : boolean = false;
 
@@ -30,7 +30,9 @@ export class TimeSheetComponent {
   currentPage = 0;
   total = 0;                       // rows that match the search, over all pages
   readonly sortableColumns = ['employee', 'whenEntered', 'notes'];
-  sort = loadSort('timesheet', this.sortableColumns, 'whenEntered:desc');   // the sort the person left, else newest first
+  readonly defaultSort = 'whenEntered:desc';   // newest first
+  sort = loadSort('timesheet', this.sortableColumns, this.defaultSort);   // the sort the person left, else the default
+  sortMenu: { x: number; y: number } | null = null;   // the right-click menu (Clear sort), where it is open
   loaded = false;                  // true once a page has arrived, so "No time sheets" is not shown while waiting
   searchText = '';
 
@@ -155,17 +157,37 @@ export class TimeSheetComponent {
     return ariaSort(this.sort, column);
   }
 
+  /** Back to the default order and forget the saved sort. */
+  clearSort(): void {
+    this.sort = this.defaultSort;
+    forgetSort('timesheet');
+    this.sortMenu = null;
+    this.currentPage = 0;
+    this.getTimeSheets();
+  }
+
+  openSortMenu(event: MouseEvent): void {
+    event.preventDefault();
+    this.sortMenu = { x: event.clientX, y: event.clientY };
+  }
+
+  @HostListener('document:click')
+  @HostListener('document:keydown.escape')
+  closeSortMenu(): void {
+    this.sortMenu = null;
+  }
+
   search(): void {
     this.currentPage = 0;
     this.getTimeSheets();
   }
 
-  private employeeOf(employeeId?: number): Employee | undefined {
+  private employeeOf(employeeId?: number): EmployeeLookup | undefined {
     return this.employees.find(employee => employee.employeeId == employeeId);
   }
 
   private getEmployees() {
-    this.employeeService.getAll().subscribe(value => {
+    this.employeeService.getLookup().subscribe(value => {
       this.employees = value;
       this.getTimeSheets();
     });

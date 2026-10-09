@@ -8,9 +8,10 @@
                 <form class="search-bar" (submit)="search(); $event.preventDefault()">
                     <input type="search" name="searchText" [(ngModel)]="searchText" placeholder="Search reason or employee" aria-label="Search requests">
                     <button type="submit" class="btn-action">Search</button>
+                    <button type="button" class="btn-action" [disabled]="sort === defaultSort" (click)="clearSort()">Clear sort</button>
                 </form>
                 <p *ngIf="loaded && paginatedRequests.length === 0">No requests{{ searchText ? ' match "' + searchText + '"' : '' }}.</p>
-                <table *ngIf="paginatedRequests!.length > 0">
+                <table *ngIf="paginatedRequests!.length > 0" (contextmenu)="openSortMenu($event)">
                     <thead>
                         <tr>
                             <th [attr.aria-sort]="ariaSort('employee')"><button type="button" class="sort-header" (click)="sortBy('employee')">Employee{{ sortMark('employee') }}</button></th>
@@ -34,6 +35,9 @@
                         </tr>
                     </tbody>
                 </table>
+                <ul *ngIf="sortMenu" class="sort-menu" role="menu" [style.left.px]="sortMenu.x" [style.top.px]="sortMenu.y">
+                    <li role="none"><button type="button" role="menuitem" [disabled]="sort === defaultSort" (click)="clearSort()">Clear sort</button></li>
+                </ul>
                 <mat-paginator
                     *ngIf="total > 0"
                     [length]="total"

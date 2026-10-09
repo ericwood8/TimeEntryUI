@@ -1,4 +1,4 @@
-import { ariaSort, loadSort, nextSort, saveSort, sortMark } from './grid-sort';
+import { ariaSort, forgetSort, loadSort, nextSort, saveSort, sortMark } from './grid-sort';
 
 describe('grid sort', () => {
   const columns = ['employee', 'whenEntered', 'notes'];
@@ -28,6 +28,16 @@ describe('grid sort', () => {
 
     saveSort('timesheet', 'notes:sideways');
     expect(loadSort('timesheet', columns, 'whenEntered:desc')).toBe('whenEntered:desc');
+  });
+
+  it('forgets the saved sort of one grid and leaves the others', () => {
+    saveSort('timesheet', 'notes:asc');
+    saveSort('request', 'reason:desc');
+
+    forgetSort('timesheet');
+
+    expect(loadSort('timesheet', columns, 'whenEntered:desc')).toBe('whenEntered:desc');
+    expect(loadSort('request', ['reason'], 'reason:asc')).toBe('reason:desc');
   });
 
   it('sorts a new column ascending and flips a column that is already sorted', () => {

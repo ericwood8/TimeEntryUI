@@ -8,11 +8,12 @@
         <form class="search-bar" (submit)="search(); $event.preventDefault()">
           <input type="search" name="searchText" [(ngModel)]="searchText" placeholder="Search notes or employee" aria-label="Search time sheets">
           <button type="submit" class="btn-action">Search</button>
+          <button type="button" class="btn-action" [disabled]="sort === defaultSort" (click)="clearSort()">Clear sort</button>
         </form>
         @if (loaded && this.timeSheets.length === 0) {
         <p>No time sheets{{ searchText ? ' match "' + searchText + '"' : '' }}.</p>
         }
-        <table>
+        <table (contextmenu)="openSortMenu($event)">
           <thead>
             <tr>
               <th [attr.aria-sort]="ariaSort('employee')"><button type="button" class="sort-header" (click)="sortBy('employee')">Employee{{ sortMark('employee') }}</button></th>
@@ -40,6 +41,11 @@
             }
           </tbody>
         </table>
+        @if (sortMenu) {
+        <ul class="sort-menu" role="menu" [style.left.px]="sortMenu.x" [style.top.px]="sortMenu.y">
+          <li role="none"><button type="button" role="menuitem" [disabled]="sort === defaultSort" (click)="clearSort()">Clear sort</button></li>
+        </ul>
+        }
         @if (total > 0) {
         <mat-paginator [length]="total" [pageIndex]="currentPage" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)"></mat-paginator>
         }

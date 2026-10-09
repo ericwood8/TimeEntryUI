@@ -1,15 +1,15 @@
 import { apiMessage } from "../../services/api-error";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener } from '@angular/core';
 import { Request } from '../../models/request';
 import { ClearanceType, ExpenseType, LeaveType, OvertimeType, SY_RequestStatusType } from '../../utils/enums';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { RequestService } from '../../services/request.service';
 import { EmployeeService } from '../../services/employee.service';
-import { Employee } from '../../models/employee';
+import { EmployeeLookup } from '../../models/employee';
 import { AuthService } from '../../services/auth.service';
-import { ariaSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/grid-sort';
+import { ariaSort, forgetSort, loadSort, nextSort, saveSort, sortMark } from '../../utils/grid-sort';
 
 @Component({
   selector: 'app-request',
@@ -30,11 +30,13 @@ export class RequestComponent {
   total = 0;                       // rows that match the search, over all pages
   paginatedRequests: Request[] = [];
   readonly sortableColumns = ['employee', 'reason', 'whenRequested', 'status'];
-  sort = loadSort('request', this.sortableColumns, 'whenRequested:desc');   // the sort the person left, else newest first
+  readonly defaultSort = 'whenRequested:desc';   // newest first
+  sort = loadSort('request', this.sortableColumns, this.defaultSort);   // the sort the person left, else the default
+  sortMenu: { x: number; y: number } | null = null;   // the right-click menu (Clear sort), where it is open
   loaded = false;                  // true once a page has arrived, so "No requests" is not shown while waiting
   searchText = '';
   selectedRequest: Request | null = null;
-  employees: Employee[] = [];
+  employees: EmployeeLookup[] = [];
 
   selectedReason: string | null = null;
 
@@ -107,6 +109,26 @@ export class RequestComponent {
     return ariaSort(this.sort, column);
   }
 
+  /** Back to the default order and forget the saved sort. */
+  clearSort(): void {
+    this.sort = this.defaultSort;
+    forgetSort('request');
+    this.sortMenu = null;
+    this.currentPage = 0;
+    this.getList();
+  }
+
+  openSortMenu(event: MouseEvent): void {
+    event.preventDefault();
+    this.sortMenu = { x: event.clientX, y: event.clientY };
+  }
+
+  @HostListener('document:click')
+  @HostListener('document:keydown.escape')
+  closeSortMenu(): void {
+    this.sortMenu = null;
+  }
+
   /** The name to show in place of an employee id (the employees are loaded once for the grid). */
   employeeName(id?: number): string {
     return this.employees.find((e) => e.employeeId === id)?.name ?? '';
@@ -118,7 +140,7 @@ export class RequestComponent {
   }
 
   private getEmployees(): void {
-    this.employeeService.getAll().subscribe((data) => {
+    this.employeeService.getLookup().subscribe((data) => {
       this.employees = data;
     });
   }

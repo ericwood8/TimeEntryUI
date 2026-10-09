@@ -421,3 +421,30 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .sort-header:focus-visible {
   text-decoration: underline;
 }
+
+/* the right-click menu of a sortable grid (Clear sort) */
+.sort-menu {
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.sort-menu button {
+  background: none;
+  border: 0;
+  padding: 6px 12px;
+  font: inherit;
+  color: black;
+  cursor: pointer;
+}
+
+.sort-menu button:disabled {
+  color: #888;
+  cursor: default;
+}

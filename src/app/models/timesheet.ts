@@ -1,9 +1,9 @@
-import { Employee } from "./employee";
+import { EmployeeLookup } from "./employee";
 
 export interface TimeSheet {
    timeSheetId?: number;
    whenEntered?: Date;
    employeeId?: number;
-   employee?: Employee;
+   employee?: EmployeeLookup;
    notes?: string;
 }

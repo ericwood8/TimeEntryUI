@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Employee } from '../models/employee';
+import { Employee, EmployeeLookup } from '../models/employee';
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +14,11 @@ export class EmployeeService {
     // Get all employees
     getAll(): Observable<Employee[]> {
         return this.http.get<Employee[]>(this.apiUrl);
+    }
+
+    // Get just the id and the name of the active employees: for drop-downs and name columns (a fraction of getAll(), which carries manager, department and team)
+    getLookup(): Observable<EmployeeLookup[]> {
+        return this.http.get<EmployeeLookup[]>(`${this.apiUrl}/lookup`);
     }
 
     // Get a employee by ID
