@@ -57,7 +57,7 @@ export class TimesheetdetailComponent {
       this.timeSheetDetails = [];
       return;
     }
-    this.timeSheetDetailService.getTimeSheetDetailById(timeSheetId).subscribe({
+    this.timeSheetDetailService.getOfTimeSheet(timeSheetId).subscribe({
       error: (e) => {
         console.error(e);
       },
@@ -87,7 +87,7 @@ export class TimesheetdetailComponent {
     if (timeSheetDetail.timeSheetDetailId == undefined || !confirm("Are you sure you want to delete this detail?")) {
       return;
     }
-    this.timeSheetDetailService.deleteTimeSheetDetail(timeSheetDetail.timeSheetDetailId).subscribe({
+    this.timeSheetDetailService.delete(timeSheetDetail.timeSheetDetailId).subscribe({
       next: () => {
         this.timeSheetDetails = this.timeSheetDetails.filter(d => d.timeSheetDetailId !== timeSheetDetail.timeSheetDetailId);
       },
@@ -132,11 +132,11 @@ export class TimesheetdetailComponent {
     //New detail
     if (detail.timeSheetDetailId == undefined) {
       detail.timeSheetDetailId = 0;
-      this.timeSheetDetailService.createTimeSheetDetail(detail).subscribe(saved);
+      this.timeSheetDetailService.create(detail).subscribe(saved);
     }
     //existing detail
     else {
-      this.timeSheetDetailService.updateTimeSheetDetail(detail.timeSheetDetailId, detail).subscribe(saved);
+      this.timeSheetDetailService.update(detail.timeSheetDetailId, detail).subscribe(saved);
     }
   }
 

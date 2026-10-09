@@ -2,47 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Employee, EmployeeLookup } from '../models/employee';
+import { NamedCrudService } from './crud.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class EmployeeService {
-    private apiUrl = 'api/employees'; // Replace with your API URL
-
-    constructor(private http: HttpClient) { }
-
-    // Get all employees
-    getAll(): Observable<Employee[]> {
-        return this.http.get<Employee[]>(this.apiUrl);
+export class EmployeeService extends NamedCrudService<Employee> {
+    constructor(http: HttpClient) {
+        super(http, 'api/employees');
     }
 
     // Get just the id and the name of the active employees: for drop-downs and name columns (a fraction of getAll(), which carries manager, department and team)
     getLookup(): Observable<EmployeeLookup[]> {
         return this.http.get<EmployeeLookup[]>(`${this.apiUrl}/lookup`);
-    }
-
-    // Get a employee by ID
-    getById(id: number): Observable<Employee> {
-        return this.http.get<Employee>(`${this.apiUrl}/${id}`);
-    }
-
-    // Create a new employee
-    create(employee: Employee): Observable<Employee> {
-        return this.http.post<Employee>(this.apiUrl, employee);
-    }
-
-    // Update a employee
-    update(id: number, employee: Employee): Observable<Employee> {
-        return this.http.put<Employee>(`${this.apiUrl}/${id}`, employee);
-    }
-
-    // Delete a employee
-    delete(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
-    }
-
-    // Find by Name
-    findByName(name: string): Observable<Employee[]> {
-        return this.http.get<Employee[]>(`${this.apiUrl}/${name}`);
     }
 }

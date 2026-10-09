@@ -2,35 +2,18 @@ import { Injectable } from '@angular/core';
 import { TimeSheetDetail } from '../models/timesheetdetail';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CrudService } from './crud.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TimeSheetDetailService {
-
-  private apiUrl = 'api/timesheetDetails'; // Replace with your API URL
-
-  constructor(private http: HttpClient) {
-    
-  };
-
-  // Get a project by ID
-  getTimeSheetDetailById(id: number): Observable<TimeSheetDetail[]> {
-    return this.http.get<TimeSheetDetail[]>(`${this.apiUrl}/timeSheet/${id}`);
+export class TimeSheetDetailService extends CrudService<TimeSheetDetail> {
+  constructor(http: HttpClient) {
+    super(http, 'api/timesheetDetails');
   }
 
-  // Create a new project
-  createTimeSheetDetail(timeSheetDetail: TimeSheetDetail): Observable<TimeSheetDetail> {
-    return this.http.post<TimeSheetDetail>(this.apiUrl, timeSheetDetail);
-  }
-
-  // Update a project
-  updateTimeSheetDetail(id: number, timeSheetDetail: TimeSheetDetail): Observable<TimeSheetDetail> {
-    return this.http.put<TimeSheetDetail>(`${this.apiUrl}/${id}`, timeSheetDetail);
-  }
-
-  // Delete a project
-  deleteTimeSheetDetail(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  // The details of one time sheet (there is no list of all of them)
+  getOfTimeSheet(timeSheetId: number): Observable<TimeSheetDetail[]> {
+    return this.http.get<TimeSheetDetail[]>(`${this.apiUrl}/timeSheet/${timeSheetId}`);
   }
 }

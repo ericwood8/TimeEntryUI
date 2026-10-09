@@ -3,42 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TimeSheet } from '../models/timesheet';
 import { PageQuery, Paginated, pageParams } from '../models/paginated';
+import { CrudService } from './crud.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class TimeSheetService {
-    private apiUrl = 'api/timesheets'; // Replace with your API URL
-
-    constructor(private http: HttpClient) { }
-
-    // Get all time sheets
-    getAll(): Observable<TimeSheet[]> {
-        return this.http.get<TimeSheet[]>(this.apiUrl);
+export class TimeSheetService extends CrudService<TimeSheet> {
+    constructor(http: HttpClient) {
+        super(http, 'api/timesheets');
     }
 
     // Get one page of time sheets, sorted and filtered by the server
     getPage(query: PageQuery): Observable<Paginated<TimeSheet>> {
         return this.http.get<Paginated<TimeSheet>>(this.apiUrl, { params: pageParams(query) });
-    }
-
-    // Get a time sheet by ID
-    getById(id: number): Observable<TimeSheet> {
-        return this.http.get<TimeSheet>(`${this.apiUrl}/${id}`);
-    }
-
-    // Create a new time sheet
-    create(timeSheet: TimeSheet): Observable<TimeSheet> {
-        return this.http.post<TimeSheet>(this.apiUrl, timeSheet);
-    }
-
-    // Update a time sheet
-    update(id: number, timeSheet: TimeSheet): Observable<TimeSheet> {
-        return this.http.put<TimeSheet>(`${this.apiUrl}/${id}`, timeSheet);
-    }
-
-    // Delete a time sheet
-    delete(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 }
