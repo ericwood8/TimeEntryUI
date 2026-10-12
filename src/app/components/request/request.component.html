@@ -10,6 +10,26 @@
                     <button type="submit" class="btn-action">Search</button>
                     <button type="button" class="btn-action" [disabled]="sort === defaultSort" (click)="clearSort()">Clear sort</button>
                 </form>
+                <section *ngIf="toApprove.length > 0" aria-labelledby="toApproveHeading">
+                    <h2 id="toApproveHeading">To approve</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Employee</th><th>Reason</th><th>Dates</th><th>Requested On</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let request of toApprove">
+                                <td>{{ employeeName(request.employeeId) }}</td>
+                                <td>{{ request.reason }}</td>
+                                <td>{{ request.leaveStart ? (request.leaveStart | date: 'shortDate') + ' to ' + (request.leaveEnd | date: 'shortDate') : '' }}</td>
+                                <td>{{ request.whenRequested | date: 'short' }}</td>
+                                <td>
+                                    <button (click)="approve(request)" class="btn-action">Approve</button>
+                                    <button (click)="reject(request)" class="btn-action delete">Reject</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
                 <p *ngIf="loaded && rows.length === 0">No requests{{ searchText ? ' match "' + searchText + '"' : '' }}.</p>
                 <table *ngIf="rows!.length > 0" (contextmenu)="openSortMenu($event)">
                     <thead>
@@ -25,10 +45,12 @@
                             <td>{{ employeeName(request.employeeId) }}</td>
                             <td>{{ request.reason }}</td>
                             <td>{{ request.whenRequested | date: 'short' }}</td>
-                            <td>{{ SY_RequestStatusTypeEnum[request.sY_RequestStatusTypeId ?? 1] }}</td>
+                            <td>{{ statusName(request.sY_RequestStatusTypeId) }}</td>
                             <td>
                                 <button (click)="edit(request)"
                                     class="btn-action">Edit</button>
+                                <button *ngIf="canCancel(request)" (click)="cancelRequest(request)"
+                                    class="btn-action">Cancel request</button>
                                 <button (click)="delete(request.requestId!)"
                                     class="btn-action delete disabled">Delete</button>
                             </td>

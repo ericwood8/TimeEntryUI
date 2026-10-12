@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, inject } from '@angular/core';
 import { Request } from '../../models/request';
-import { ClearanceType, ExpenseType, LeaveType, OvertimeType, SY_RequestStatusType } from '../../utils/enums';
+import { ClearanceType, ExpenseType, LeaveType, OvertimeType } from '../../utils/enums';
+import { RequestStatus } from '../../models/request-status';
+import { apiMessage } from '../../services/api-error';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { RequestService } from '../../services/request.service';
 import { EmployeeService } from '../../services/employee.service';
@@ -42,11 +44,11 @@ export class RequestComponent extends PagedCrudScreen<Request> {
   showLeaveOptions = false;
   showExpenseOptions = false;
 
-  SY_RequestStatusTypeEnum = SY_RequestStatusType;
+  /** The statuses and where each can go, as the server lists them. */
+  statuses: RequestStatus[] = [];
+  /** The pending requests of the people who report to the signed-in person. */
+  toApprove: Request[] = [];
 
-  statusTypeOptions = Object.entries(SY_RequestStatusType)
-    .filter(([key, value]) => typeof value === 'number')
-    .map(([key, value]) => ({ key, value: value as number }));
   clearanceOptions = Object.entries(ClearanceType)
     .filter(([key, value]) => typeof value === 'number')
     .map(([key, value]) => ({ key, value: value as number }));
@@ -72,7 +74,46 @@ export class RequestComponent extends PagedCrudScreen<Request> {
   protected override start(): void {
     super.start();
     this.employeeService.getLookup().subscribe((data) => { this.employees = data; });
+    this.service.getStatuses().subscribe((data) => { this.statuses = data; });
+    this.loadToApprove();
   }
+
+  private loadToApprove(): void {
+    this.service.getToApprove().subscribe((data) => { this.toApprove = data; });
+  }
+
+  /** The name of a status, from the server's list. */
+  statusName(id?: number): string {
+    return this.statuses.find((s) => s.id === id)?.name ?? '';
+  }
+
+  /** Decide a request someone else made: the server moves the status (and a leave request's hours) or says why not. */
+  decide(request: Request, statusId: number): void {
+    this.service.setStatus(request, statusId).subscribe({
+      next: () => { this.load(); this.loadToApprove(); },
+      error: (error) => { alert(apiMessage(error, 'Problem while deciding!')); this.load(); this.loadToApprove(); }
+    });
+  }
+
+  /** The person's own request can be withdrawn while it is pending or approved. */
+  canCancel(request: Request): boolean {
+    const canceled = this.statuses.find((s) => s.name === 'Canceled')?.id;
+    const here = this.statuses.find((s) => s.id === request.sY_RequestStatusTypeId);
+    return request.employeeId === this.auth.user()?.employeeId && canceled !== undefined && !!here?.next.includes(canceled);
+  }
+
+  cancelRequest(request: Request): void {
+    const canceled = this.statuses.find((s) => s.name === 'Canceled')!.id;
+    if (confirm('Cancel this request?')) { this.decide(request, canceled); }
+  }
+
+  /** The id of a status by name; the buttons are named after the statuses the server lists. */
+  private statusId(name: string): number | undefined {
+    return this.statuses.find((s) => s.name === name)?.id;
+  }
+
+  approve(request: Request): void { this.decide(request, this.statusId('Approved')!); }
+  reject(request: Request): void { this.decide(request, this.statusId('Rejected')!); }
 
   /** The name to show in place of an employee id (the employees are loaded once for the grid). */
   employeeName(id?: number): string {
@@ -129,7 +170,7 @@ export class RequestComponent extends PagedCrudScreen<Request> {
   }
 
   protected newRow(): Request {
-    return { employeeId: 0, whenRequested: new Date(), sY_RequestStatusTypeId: 1 };
+    return { employeeId: 0, whenRequested: new Date(), sY_RequestStatusTypeId: 0 };   // 0: the server starts it as Pending
   }
 
   protected override prepare(request: Request, isNew: boolean): void {
@@ -139,7 +180,7 @@ export class RequestComponent extends PagedCrudScreen<Request> {
       request.employeeId = this.auth.user()?.employeeId ?? request.employeeId;
       request.whenRequested = new Date();
       request.statusDate = new Date();
-      request.sY_RequestStatusTypeId = SY_RequestStatusType.Pending;
+      request.sY_RequestStatusTypeId = 0;
     }
   }
 

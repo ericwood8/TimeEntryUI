@@ -21,6 +21,7 @@
                 <th>Manager</th>
                 <th>Department</th>
                 <th>Team</th>
+                <th>Country</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -31,6 +32,7 @@
                 <td>{{ employee.manager?.name }} </td>
                 <td>{{ employee.department?.name }} </td>
                 <td>{{ employee.departmentTeam?.name }} </td>
+                <td>{{ countryName(employee.sY_IsoCountry_Alpha3Code) }}</td>
                 <td>
                     <button (click)="edit(employee)" class="btn-action"> Edit </button>
                     <button (click)="delete(employee.employeeId!)" class="btn-action delete"> Delete </button>
@@ -75,6 +77,15 @@
                 <select id="departmentTeamId" name="departmentTeamId" [(ngModel)]="selectedRow.departmentTeamId" (ngModelChange)="onTeamSelect($event)"  required>
                     <option *ngFor="let t of filteredTeams" [ngValue]="t.departmentTeamId">
                         {{t.name}}
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="country">Country</label>
+                <select id="country" name="country" [(ngModel)]="selectedRow.sY_IsoCountry_Alpha3Code" required>
+                    <option *ngFor="let c of countries" [ngValue]="c.alpha3Code">
+                        {{c.name}}
                     </option>
                 </select>
             </div>

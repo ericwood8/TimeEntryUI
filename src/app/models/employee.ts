@@ -6,6 +6,7 @@ export interface Employee {
     managerId?: number;
     departmentId: number;
     departmentTeamId: number;
+    sY_IsoCountry_Alpha3Code: string;   // the country whose holidays apply: an ISO alpha-3 code
     availableLeaveHours: number;
     donatedHrsReceived: number;
     isActive: boolean;
